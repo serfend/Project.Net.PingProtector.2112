@@ -5,9 +5,24 @@
     <TargetFramework>net6.0-windows</TargetFramework>
     <RootNamespace>Project.Net.PingProtector._2006</RootNamespace>
     <Nullable>enable</Nullable>
-    <UseWindowsForms>true</UseWindowsForms>
+    <UseWindowsForms>True</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
+    <ApplicationIcon>favicon.ico</ApplicationIcon>
+    <AssemblyName>ClientPatch</AssemblyName>
+    <DebugType>full</DebugType>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="favicon.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Costura.Fody" Version="5.7.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="NLog" Version="4.7.12" />
+  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Common\Common.csproj" />
@@ -15,6 +30,18 @@
     <ProjectReference Include="..\NetworkApi\NetworkApi.csproj" />
     <ProjectReference Include="..\PingProtector.BLL\PingProtector.BLL.csproj" />
     <ProjectReference Include="..\PingProtector.DAL\PingProtector.DAL.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="NETworkManager.Models">
+      <HintPath>D:\serfend\services\ts-yapi\NETworkManager\Source\NETworkManager.Models\bin\Debug\net6.0-windows10.0.17763.0\NETworkManager.Models.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="nlog.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>
