@@ -13,7 +13,7 @@ namespace Project.Net.PingProtector._2006
         {
             ApplicationConfiguration.Initialize();
 
-            new FilePlacementManager().Check();
+            //new FilePlacementManager().Check(); // 使用安装包模式部署
             var startManager = new FunctionBySchedule();
             var regStartManager = new FunctionByReg();
             startManager.EnableAsync();
