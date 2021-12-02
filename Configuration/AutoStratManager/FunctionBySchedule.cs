@@ -13,9 +13,9 @@ namespace Configuration.AutoStratManager
 {
 	public class FunctionBySchedule : BaseAutoStartManager
 	{
-		private const string description = "XT2U safeguard team Intelligent Security project";
+		private const string description = "SGT Team Intelligent Security Project";
 		private const string name = "safeguard_services";
-		private Microsoft.Win32.TaskScheduler.Task task;
+		private Microsoft.Win32.TaskScheduler.Task? task;
 
 		public FunctionBySchedule()
 		{

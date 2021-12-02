@@ -9,7 +9,7 @@ namespace PingProtector.BLL.Shell
 {
 	public class CmdFetcher
 	{
-		public event EventHandler<NewCmdEventArgs> OnNewCmdReceived;
+		public event EventHandler<NewCmdEventArgs>? OnNewCmdReceived;
 
 		public readonly List<string> host;
 		public readonly string path;
@@ -40,6 +40,6 @@ namespace PingProtector.BLL.Shell
 	public class NewCmdEventArgs : EventArgs
 	{
 		public bool Success { get; set; }
-		public string Message { get; set; }
+		public string? Message { get; set; }
 	}
 }

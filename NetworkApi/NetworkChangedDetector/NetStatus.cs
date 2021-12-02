@@ -11,7 +11,7 @@ namespace NetworkApi.Network.NetworkChangedDetector
 
 		public bool IsCheckRunning { get; set; }
 		public bool IsCheckComplete { get; set; }
-		public string Status { get; set; }
+		public string? Status { get; set; }
 
 		/// <summary>
 		/// network time log , if -1 then means not reachable
@@ -19,8 +19,8 @@ namespace NetworkApi.Network.NetworkChangedDetector
 		public long Log { get; set; }
 
 		public ConnectionState ConnectionState { get; set; }
-		public string IPAddress { get; set; }
-		public string Hostname { get; set; }
+		public string? IPAddress { get; set; }
+		public string? Hostname { get; set; }
 		public const long NOT_Reachable = -1;
 	}
 }

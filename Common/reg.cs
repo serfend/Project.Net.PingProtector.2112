@@ -195,7 +195,7 @@ namespace DotNet4.Utilities
 				return result;
 			}
 
-			public virtual bool SetInfo(string name, object content)
+			public virtual bool SetInfo(string? name, object? content)
 			{
 				return SetInfo(name, content, RegValueKind.String);
 			}
@@ -334,7 +334,7 @@ namespace DotNet4.Utilities
 				return tmp;
 			}
 
-			private static string CookiesPath, CachePath;
+			private static string? CookiesPath, CachePath;
 
 			private static void CreatPath(string path)
 			{

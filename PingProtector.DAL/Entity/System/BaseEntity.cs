@@ -8,7 +8,7 @@ namespace PingProtector.DAL.Entity.System
 {
 	public abstract class BaseEntity<T> : ISoftRemove
 	{
-		public T Key { get; set; }
+		public T? Key { get; set; }
 		public bool IsRemoved { get; set; }
 		public DateTime RemoveDate { get; set; }
 

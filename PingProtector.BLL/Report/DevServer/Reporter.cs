@@ -1,5 +1,4 @@
-﻿using DotNet4.Utilities.UtilCode;
-using DotNet4.Utilities.UtilReg;
+﻿using DotNet4.Utilities.UtilReg;
 using Newtonsoft.Json;
 using System;
 using System.Diagnostics;
@@ -14,14 +13,14 @@ namespace DevServer
 		public static string Host { get; set; } = "https://serfend.top";
 		public static string LogPath { get; set; } = "/log/report";
 		public static string UserName { get; set; } = "PC";
-		private string Uid { get; set; } = new Reg().In("Setting").GetInfo("uid", HttpUtil.UfUID);
+		private string Uid { get; set; } = new Reg().In("Setting").GetInfo("uid", Guid.NewGuid().ToString());
 
 		public Reporter()
 		{
 			http = new HttpClient();
 		}
 
-		public HttpResponseMessage Report(string host = null, string logPath = null, Report report = null, string method = "Post")
+		public HttpResponseMessage Report(string? host = null, string? logPath = null, Report? report = null, string method = "Post")
 		{
 			if (host == null) host = Host;
 			if (!host.StartsWith("http")) host = $"http://{host}";

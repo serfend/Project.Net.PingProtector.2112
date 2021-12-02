@@ -13,6 +13,10 @@ namespace Project.Core.Protector.DAL.Entity.Record
 		/// <summary>
 		/// 尝试连接的ip
 		/// </summary>
-		public string TargetIp { get; set; }
+		public string? TargetIp { get; set; }
+		/// <summary>
+		/// 尝试连接的域名或ip
+		/// </summary>
+		public string? TargetHost { get; set; }	
 	}
 }

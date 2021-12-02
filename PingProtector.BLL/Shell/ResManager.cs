@@ -10,7 +10,7 @@ namespace PingProtector.BLL.Shell
 {
 	public static class ResManager
 	{
-		public static List<string> ShellFileName { get; set; }
+		public static List<string> ShellFileName { get; set; } = new List<string>();
 
 		public static void SetCurrentResPath(string path)
 		{
@@ -20,9 +20,10 @@ namespace PingProtector.BLL.Shell
 
 		public static async Task<IEnumerable<Tuple<string, string>>> RunAll()
 		{
+			var cmdRunner = new CmdExecutor();	
 			var tasks = ShellFileName
 				.Select(f => new Tuple<string, string>(f, File.ReadAllText(f, Encoding.UTF8)))
-				.Select(cmd => CmdExecutor.CmdRunAsync(cmd.Item1, cmd.Item2));
+				.Select(cmd => cmdRunner.CmdRunAsync(cmd.Item1, cmd.Item2));
 			var results = new List<Tuple<string, string>>();
 			foreach (var t in tasks) results.Add(await t.ConfigureAwait(true));
 			return results;
