@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="NLog" Version="4.7.12" />
   </ItemGroup>
 
   <ItemGroup>
@@ -16,6 +17,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Reference Include="DSAPI">
+      <HintPath>..\vendor\DSAPI.dll</HintPath>
+    </Reference>
     <Reference Include="NETworkManager.Models">
       <HintPath>D:\serfend\services\ts-yapi\NETworkManager\Source\NETworkManager.Models\bin\Debug\net6.0-windows10.0.17763.0\NETworkManager.Models.dll</HintPath>
     </Reference>
