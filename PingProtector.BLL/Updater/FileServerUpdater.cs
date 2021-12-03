@@ -25,7 +25,9 @@ namespace PingProtector.BLL.Updater
         public FileServerUpdater(List<string> host)
         {
             this.Host = host;
-            CheckUpdate();
+            Task.Run(() => {
+                CheckUpdate();
+            });
             checkUpdate = new Timer(new TimerCallback(o => CheckUpdate()), null, 0, 60000);
             OnNewVersion += (s, e) => { };
             OnNewVersion?.Invoke(this, new NewVersionEventArgs());
