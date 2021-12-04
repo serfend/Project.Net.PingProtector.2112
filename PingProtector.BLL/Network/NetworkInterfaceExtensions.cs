@@ -1,4 +1,6 @@
 ﻿using Common.Network;
+using DotNet4.Utilities.UtilReg;
+using Microsoft.Win32;
 using NETworkManager.Models.Network;
 using NLog;
 using PingProtector.BLL.Shell;
@@ -48,27 +50,42 @@ namespace PingProtector.BLL.Network
             var config = g.ToConfig();
             OnDhcpOpend?.Invoke(null, new DhcpOpendEventArgs(g));
             Interface.ConfigureNetworkInterface(config); // 使用powershell方式执行
-
-            ManagementClass mc = new ManagementClass("Win32_NetworkAdapterConfiguration");
-            ManagementObjectCollection moc = mc.GetInstances();
-            var parIPSetting = mc.GetMethodParameters("EnableStatic");//对于有参数的Win32_NetworkAdapterConfiguration类的方法，得先用GetMethodParameters方法来获得参数对象，然后再给参数赋值。
-            parIPSetting["IPAddress"] = new string[] { config.IPAddress };
-            parIPSetting["SubnetMask"] = new string[] { config.Subnetmask };
-            mc.InvokeMethod("EnableStatic", parIPSetting, null);//这是一个设置IP地址及子网掩码的例子
+            //// 使用Management实现（仅支持windows）
+            //ManagementClass mc = new ManagementClass("Win32_NetworkAdapterConfiguration");
+            //ManagementObjectCollection moc = mc.GetInstances();
+            //var parIPSetting = mc.GetMethodParameters("EnableStatic");//对于有参数的Win32_NetworkAdapterConfiguration类的方法，得先用GetMethodParameters方法来获得参数对象，然后再给参数赋值。
+            //parIPSetting["IPAddress"] = new string[] { config.IPAddress };
+            //parIPSetting["SubnetMask"] = new string[] { config.Subnetmask };
+            //mc.InvokeMethod("EnableStatic", parIPSetting, null);//这是一个设置IP地址及子网掩码的例子
             return true;
         }
+        private static string reg_components = "DisabledComponents";
+        private static int reg_disableBothIpv6Config = 0x11;
+        private static string reg_ipv6Config = @"SYSTEM\CurrentControlSet\Services\Tcpip6\Parameters";
         /// <summary>
         /// 检查是否开启了ipv6
         /// </summary>
         /// <param name="g"></param>
         public static void CheckIpv6(this NetworkInterfaceInfo g, Action<object?, MessageEventArgs>? OnCmdMessage = null)
         {
-            if (!g.IPv6ProtocolAvailable || g.Status != System.Net.NetworkInformation.OperationalStatus.Up ) return;
-            
-            var cmd = $"Disable-NetAdapterBinding -Name '{g.Name}' -ComponentID ms_tcpip6 -PassThru";
-            var runner = new CmdExecutor(CmdExecutor.Process_Powershell);
-            runner.OnMessage += (s, e) => OnCmdMessage?.Invoke(s, e);
-            runner.CmdRun("disable ipv6", cmd, null, true);
+            if (!g.IPv6ProtocolAvailable || g.Status != System.Net.NetworkInformation.OperationalStatus.Up) return;
+
+            var reg = new Reg(reg_ipv6Config, RegDomain.LocalMachine);
+            var current = long.Parse(reg.GetInfo(reg_components, "0"));
+            if (current != reg_disableBothIpv6Config)
+            {
+                reg.SetInfo(reg_components, reg_disableBothIpv6Config, RegValueKind.DWord);
+                OnCmdMessage?.Invoke(null, new MessageEventArgs(MessageEventArgs.MessageType.Info, "ipv6已从激活变为禁用"));
+                DSAPI.文件.立即应用注册表更新();
+                return;
+            }
+            // TODO 需要重启电脑
+            OnCmdMessage?.Invoke(null, new MessageEventArgs(MessageEventArgs.MessageType.Error, "已设置但未生效,需要重启电脑"));
+            // 在win7上不支持powershell此语法
+            //var cmd = $"Disable-NetAdapterBinding -Name '{g.Name}' -ComponentID ms_tcpip6 -PassThru";
+            //var runner = new CmdExecutor(CmdExecutor.Process_Powershell);
+            //runner.OnMessage += (s, e) => OnCmdMessage?.Invoke(s, e);
+            //runner.CmdRun("disable ipv6", cmd, null, true);
         }
         /// <summary>
         /// 检查是否是合规的网关地址范围
