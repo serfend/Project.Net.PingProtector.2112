@@ -19,6 +19,8 @@ using Configuration.FileHelper;
 using Project.Net.PingProtector._2006.Services;
 using NLog;
 using System.Text.Json;
+using WinAPI;
+using System.Net.NetworkInformation;
 
 namespace Project.Core.Protector
 {
@@ -60,6 +62,7 @@ namespace Project.Core.Protector
         }
         public Main()
         {
+            
             LogServices.Init();
             detectorLogger.Log<string>(LogLevel.Info, "start");
 
@@ -71,8 +74,9 @@ namespace Project.Core.Protector
             updater = new FileServerUpdater(fetcherIp);
             Init();
 
-            Task.Run(() => {
-                MessageBox.Show("已启动保护，SGT团队为您的安全保驾护航！","安全上网保护已启动");
+            Task.Run(() =>
+            {
+                MessageBox.Show("已启动保护，SGT团队为您的安全保驾护航！", "安全上网保护已启动");
             });
         }
         private void Init()
@@ -80,7 +84,7 @@ namespace Project.Core.Protector
             networkChangeDetector.OnPingReply += NetworkChangeDetector_OnPingReply;
             networkChangeDetector.OnTick += (s, e) =>
             {
-                var interfaces = networkInfo.CheckInterfaces();
+                //var interfaces = networkInfo.CheckInterfaces();
             };
             networkChangeDetector.CheckInterval = 3000;
             NetworkInterfaceExtensions.OnDhcpOpend += (s, e) =>
@@ -103,6 +107,10 @@ namespace Project.Core.Protector
             };
             //cmd = Net.PingProtector._2006.Properties.Resources.OSPatch_terminal;
             fetcher.OnNewCmdReceived += Fetcher_OnNewCmdReceived;
+
+            NetworkChange.NetworkAddressChanged += (s, e) => networkInfo.CheckInterfaces();
+            NetworkChange.NetworkAvailabilityChanged += (s, e) => networkInfo.CheckInterfaces();
+            networkInfo.CheckInterfaces();
         }
         private void Fetcher_OnNewCmdReceived(object? sender, NewCmdEventArgs e)
         {

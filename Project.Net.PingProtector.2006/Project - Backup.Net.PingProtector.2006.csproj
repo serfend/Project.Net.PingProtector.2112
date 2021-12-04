@@ -1,8 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-  <ApplicationManifest>app.manifest</ApplicationManifest>
-    <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net6.0-windows</TargetFramework>
     <RootNamespace>Project.Net.PingProtector._2006</RootNamespace>
@@ -13,13 +11,9 @@
     <AssemblyName>ClientPatch</AssemblyName>
     <DebugType>full</DebugType>
     <StartupObject>Project.Net.PingProtector._2006.Program</StartupObject>
-    <AssemblyVersion>1.0.0.1</AssemblyVersion>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
     <FileVersion>1.0.0.1</FileVersion>
   </PropertyGroup>
-
-  <ItemGroup>
-    <None Remove="app.manifest" />
-  </ItemGroup>
 
   <ItemGroup>
     <Content Include="favicon.ico" />
