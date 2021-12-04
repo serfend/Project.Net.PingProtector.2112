@@ -3,19 +3,23 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31912.275
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Project.Net.PingProtector.2006", "Project.Net.PingProtector.2006\Project.Net.PingProtector.2006.csproj", "{571A3683-007E-468E-B1A0-ED034282A1B1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Project.Net.PingProtector.2006", "Project.Net.PingProtector.2006\Project.Net.PingProtector.2006.csproj", "{571A3683-007E-468E-B1A0-ED034282A1B1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PingProtector.DAL", "PingProtector.DAL\PingProtector.DAL.csproj", "{2E8EF306-2210-40E2-A667-33D12D12E225}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PingProtector.DAL", "PingProtector.DAL\PingProtector.DAL.csproj", "{2E8EF306-2210-40E2-A667-33D12D12E225}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PingProtector.BLL", "PingProtector.BLL\PingProtector.BLL.csproj", "{D2471E00-4F5B-42FF-B783-7A3A5BBC15EA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PingProtector.BLL", "PingProtector.BLL\PingProtector.BLL.csproj", "{D2471E00-4F5B-42FF-B783-7A3A5BBC15EA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common", "Common\Common.csproj", "{78909665-23FC-4A1C-A420-633DE3C19B0E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Common", "Common\Common.csproj", "{78909665-23FC-4A1C-A420-633DE3C19B0E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Configuration", "Configuration\Configuration.csproj", "{8D140C74-24CA-42E6-B8FF-0D5511C9E733}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Configuration", "Configuration\Configuration.csproj", "{8D140C74-24CA-42E6-B8FF-0D5511C9E733}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Commons", "Commons", "{B80F91BF-DD05-4A12-8EDB-E2BB52667E04}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetworkApi", "NetworkApi\NetworkApi.csproj", "{0F9CD95E-46AE-4C22-9355-7049C1F24B08}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetworkApi", "NetworkApi\NetworkApi.csproj", "{0F9CD95E-46AE-4C22-9355-7049C1F24B08}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WinAPI", "WinAPI\WinAPI.csproj", "{9DB66A01-4528-4AD6-B1D0-4D435F24D6C6}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SGTClientPatchServices", "SGTClientPatchServices\SGTClientPatchServices.csproj", "{18FDD3A5-C1A3-4F53-A3AF-A467E78068CD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -47,6 +51,14 @@ Global
 		{0F9CD95E-46AE-4C22-9355-7049C1F24B08}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0F9CD95E-46AE-4C22-9355-7049C1F24B08}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0F9CD95E-46AE-4C22-9355-7049C1F24B08}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9DB66A01-4528-4AD6-B1D0-4D435F24D6C6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9DB66A01-4528-4AD6-B1D0-4D435F24D6C6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9DB66A01-4528-4AD6-B1D0-4D435F24D6C6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9DB66A01-4528-4AD6-B1D0-4D435F24D6C6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{18FDD3A5-C1A3-4F53-A3AF-A467E78068CD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{18FDD3A5-C1A3-4F53-A3AF-A467E78068CD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{18FDD3A5-C1A3-4F53-A3AF-A467E78068CD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{18FDD3A5-C1A3-4F53-A3AF-A467E78068CD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
