@@ -37,8 +37,6 @@ namespace Configuration.AutoStratManager
 				{
 					var target = exePath.MD5();
 					var current = ConfigurationManager.Current.ApplicationFullName.MD5();
-					//var item = new { target, current };
-					//MessageBox.Show(JsonConvert.SerializeObject(item));
 					if (target == current) return;
 				}
 				File.Copy(ConfigurationManager.Current.ApplicationFullName, exePath, true);

@@ -20,13 +20,13 @@ namespace SGTClientPatchServices
                     FileName = Path.Join(AppDomain.CurrentDomain.BaseDirectory, $"{Project.Core.Protector.Main.PackageName}.exe"),
                     UseShellExecute = true,
                 },
-                
+
             };
         }
+        private Process? process = null;
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             _logger.LogInformation("services execute : {time}", DateTimeOffset.Now);
-            Process? process = null;
             while (!stoppingToken.IsCancellationRequested)
             {
                 var shouldStart = process?.HasExited ?? true;
@@ -49,6 +49,7 @@ namespace SGTClientPatchServices
         public override Task StopAsync(CancellationToken stoppingToken)
         {
             _logger.LogInformation("services stop : {time}", DateTimeOffset.Now);
+            if (!(process?.HasExited ?? true)) process?.Kill();
             return base.StopAsync(stoppingToken);
         }
 

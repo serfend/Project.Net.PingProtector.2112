@@ -1,5 +1,6 @@
 using Configuration.AutoStratManager;
 using Project.Core.Protector;
+using WinAPI;
 
 namespace Project.Net.PingProtector._2006
 {
@@ -26,19 +27,20 @@ namespace Project.Net.PingProtector._2006
             }
             catch (Exception ex)
             {
-                MessageBox.Show(null, ex.Message + "\n" + ex.StackTrace, "主线异常", MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1, MessageBoxOptions.ServiceNotification);
+                WTSapi32.ShowMessageBox(ex.Message + "\n" + ex.StackTrace, "主线异常", WTSapi32.DialogStyle.MB_OK | WTSapi32.DialogStyle.MB_ICONERROR);
+
             }
         }
 
 
         private static void Application_ThreadException(object sender, ThreadExceptionEventArgs e)
         {
-            MessageBox.Show($"{e.Exception.Message}\n{e.Exception.StackTrace}", "线程错误", MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1, MessageBoxOptions.ServiceNotification);
+            WTSapi32.ShowMessageBox($"{e.Exception.Message}\n{e.Exception.StackTrace}", "线程错误", WTSapi32.DialogStyle.MB_OK | WTSapi32.DialogStyle.MB_ICONERROR);
         }
 
         private static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
-            MessageBox.Show(e.ExceptionObject.ToString(), "系统错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            WTSapi32.ShowMessageBox(e.ExceptionObject.ToString(), "系统错误", WTSapi32.DialogStyle.MB_OK | WTSapi32.DialogStyle.MB_ICONERROR);
         }
     }
 }

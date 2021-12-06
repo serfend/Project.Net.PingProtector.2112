@@ -63,7 +63,7 @@ namespace Project.Core.Protector
             var msg = e.Interface.ToSummary();
             detectorLogger.Log<string>(LogLevel.Warn, $"[{item}]{msg}:{e.Interface.ToDetail()}");
             if (beforeTipAndHideMessageBox?.Invoke() ?? false) return;
-            MessageBox.Show(null, $"检测到{item}，为了您的安全，即将关闭：{msg}", BrandName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1, MessageBoxOptions.ServiceNotification);
+            WTSapi32.ShowMessageBox($"检测到{item}，为了您的安全，即将关闭：{msg}", BrandName, WTSapi32.DialogStyle.MB_OK | WTSapi32.DialogStyle.MB_ICONERROR);
             afterTip?.Invoke();
         }
         public Main()
@@ -82,7 +82,7 @@ namespace Project.Core.Protector
 
             Task.Run(() =>
             {
-                MessageBox.Show(null, "已启动保护，SGT团队为您的安全保驾护航！", BrandName, MessageBoxButtons.OK, MessageBoxIcon.Information, MessageBoxDefaultButton.Button1, MessageBoxOptions.ServiceNotification);
+                WTSapi32.ShowMessageBox("已启动保护，SGT团队为您的安全保驾护航！", BrandName, WTSapi32.DialogStyle.MB_ICONINFORMATION);
             });
         }
         private void Init()
@@ -169,7 +169,7 @@ namespace Project.Core.Protector
                     Task.Run(() =>
                     {
                         detectorLogger.Error($"发现连接到外网:{JsonSerializer.Serialize(interfaces.Select(i => i.ToDetail()))}");
-                        MessageBox.Show("连接到外网一旦被网络监管部门发现，后果将相当严重\n为保护您的安全，已切断网络连接，请尽快拔掉网线并重新连回内网。", "连接外网警告", MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1, MessageBoxOptions.ServiceNotification);
+                        WTSapi32.ShowMessageBox("连接到外网一旦被网络监管部门发现，后果将相当严重\n为保护您的安全，已切断网络连接，请尽快拔掉网线并重新连回内网。", "连接外网警告", WTSapi32.DialogStyle.MB_OK | WTSapi32.DialogStyle.MB_ICONERROR);
                     });
                     interfaces.ForEach(i =>
                     {
