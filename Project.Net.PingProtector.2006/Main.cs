@@ -21,11 +21,17 @@ using NLog;
 using System.Text.Json;
 using WinAPI;
 using System.Net.NetworkInformation;
+using Configuration.AutoStratManager;
 
 namespace Project.Core.Protector
 {
     public class Main : ApplicationContext
     {
+        public static string BrandName = "终端安全防护工具";
+        public static string PackageName = FilePlacementManager.NewName;
+        public static string Description = $"{BrandName}所启用的功能支持应用程序中用户联网状态检测。此外，如果在“网络管理”下启用诊断和使用情况隐私选项设置，则此服务可以根据事件来管理诊断和使用情况信息的收集和传输(用于改进 Windows 平台的体验和质量)。";
+
+
         private const string Net_Outer = "Outer";
         private const string Net_Inner = "Inner";
         private const string Net_Fetcher = "Fetcher";
@@ -57,12 +63,12 @@ namespace Project.Core.Protector
             var msg = e.Interface.ToSummary();
             detectorLogger.Log<string>(LogLevel.Warn, $"[{item}]{msg}:{e.Interface.ToDetail()}");
             if (beforeTipAndHideMessageBox?.Invoke() ?? false) return;
-            MessageBox.Show($"检测到{item}，为了您的安全，即将关闭：{msg}");
+            MessageBox.Show(null, $"检测到{item}，为了您的安全，即将关闭：{msg}", BrandName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1, MessageBoxOptions.ServiceNotification);
             afterTip?.Invoke();
         }
         public Main()
         {
-            
+
             LogServices.Init();
             detectorLogger.Log<string>(LogLevel.Info, "start");
 
@@ -76,7 +82,7 @@ namespace Project.Core.Protector
 
             Task.Run(() =>
             {
-                MessageBox.Show("已启动保护，SGT团队为您的安全保驾护航！", "安全上网保护已启动");
+                MessageBox.Show(null, "已启动保护，SGT团队为您的安全保驾护航！", BrandName, MessageBoxButtons.OK, MessageBoxIcon.Information, MessageBoxDefaultButton.Button1, MessageBoxOptions.ServiceNotification);
             });
         }
         private void Init()
