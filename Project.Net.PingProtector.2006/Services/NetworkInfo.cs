@@ -17,7 +17,10 @@ namespace Project.Net.PingProtector._2006.Services
         public static string ToSummary(this NetworkInterfaceInfo? info)
         {
             if (info == null) return "[无效的网卡信息]";
-            return $"{info.Name}:{string.Join(',', info.IPv4Address.Select(i => i.ToString()))}";
+            var ips = string.Join(',', info.IPv4Address.Select(i => i.ToString()));
+            var gates = string.Join(',', info.IPv4Gateway.Select(i => i.ToString()));
+            var name = info.Name;
+            return $"{name}:{ips}(gateway:{gates})";
         }
         public static string ToDetail(this NetworkInterfaceInfo? i)
         {
