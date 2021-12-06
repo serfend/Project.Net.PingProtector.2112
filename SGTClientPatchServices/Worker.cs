@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Windows.Forms;
 
 namespace SGTClientPatchServices
@@ -10,15 +11,35 @@ namespace SGTClientPatchServices
         {
             _logger = logger;
         }
-
+        private Process NewProcess()
+        {
+            return new Process()
+            {
+                StartInfo = new ProcessStartInfo()
+                {
+                    FileName = Path.Join(AppDomain.CurrentDomain.BaseDirectory, $"{Project.Core.Protector.Main.PackageName}.exe"),
+                    UseShellExecute = true,
+                },
+                
+            };
+        }
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             _logger.LogInformation("services execute : {time}", DateTimeOffset.Now);
-            Application.Run(new Project.Core.Protector.Main());
+            Process? process = null;
             while (!stoppingToken.IsCancellationRequested)
             {
+                var shouldStart = process?.HasExited ?? true;
+                if (shouldStart)
+                {
+                    _logger.LogInformation("start new process : {time}", DateTimeOffset.Now);
+                    process = NewProcess();
+                    process.Start();
+                }
                 await Task.Delay(1000, stoppingToken);
             }
+            if (!(process?.HasExited ?? true)) process?.Kill();
+            _logger.LogInformation("services process stop : {time}", DateTimeOffset.Now);
         }
         public override Task StartAsync(CancellationToken stoppingToken)
         {
