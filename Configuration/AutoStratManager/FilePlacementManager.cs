@@ -7,7 +7,7 @@ namespace Configuration.AutoStratManager
 	public class FilePlacementManager
 	{
 		private Reg reg = new Reg().In("Runtime");
-		private string NewName = "ClientPatch";
+		public static string NewName = "ClientPatch";
 
 		public int StartTime
 		{
