@@ -15,6 +15,7 @@
     <StartupObject>Project.Net.PingProtector._2006.Program</StartupObject>
     <AssemblyVersion>1.0.0.1</AssemblyVersion>
     <FileVersion>1.0.0.1</FileVersion>
+    <SupportedOSPlatformVersion>7.0</SupportedOSPlatformVersion>
   </PropertyGroup>
 
   <ItemGroup>
