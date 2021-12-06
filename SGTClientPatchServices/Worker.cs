@@ -1,3 +1,5 @@
+using System.Windows.Forms;
+
 namespace SGTClientPatchServices
 {
     public class Worker : BackgroundService
@@ -11,11 +13,23 @@ namespace SGTClientPatchServices
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
+            _logger.LogInformation("services execute : {time}", DateTimeOffset.Now);
+            Application.Run(new Project.Core.Protector.Main());
             while (!stoppingToken.IsCancellationRequested)
             {
-                _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
                 await Task.Delay(1000, stoppingToken);
             }
         }
+        public override Task StartAsync(CancellationToken stoppingToken)
+        {
+            _logger.LogInformation("services start : {time}", DateTimeOffset.Now);
+            return base.StartAsync(stoppingToken);
+        }
+        public override Task StopAsync(CancellationToken stoppingToken)
+        {
+            _logger.LogInformation("services stop : {time}", DateTimeOffset.Now);
+            return base.StopAsync(stoppingToken);
+        }
+
     }
 }
