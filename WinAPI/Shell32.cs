@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 
 namespace WinAPI
 {
-    public static class Shell32
+    public static partial class Shell32
     {
         /// <summary>
         /// 将会触发底层重写，不建议经常用
@@ -24,4 +24,6 @@ namespace WinAPI
         [DllImport("kernel32", CharSet = CharSet.Ansi)]
         public static extern bool Beep(int frequery, int duration);
     }
+
+
 }
