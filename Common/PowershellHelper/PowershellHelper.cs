@@ -14,7 +14,7 @@ namespace Common.PowershellHelper
             var info = new ProcessStartInfo()
             {
                 FileName = "powershell.exe",
-                Arguments = $"-NoProfile -NoLogo -Command {command}",
+                Arguments = $"-NoProfile -NoLogo -Command \"{command}\"",
                 UseShellExecute = true,
                 WindowStyle = windowStyle
             };
@@ -23,9 +23,7 @@ namespace Common.PowershellHelper
                 info.Verb = "runas";
 
             using var process = new Process();
-
             process.StartInfo = info;
-
             process.Start();
             process.WaitForExit();
         }
