@@ -27,7 +27,7 @@ namespace Project.Net.PingProtector._2006.I18n.Model
     }
     public class I18nWarningItem : I18nContentItem
     {
-        public int DialogStyle { get; set; }
+        public int? DialogStyle { get; set; } = null;
     }
     public class I18nContentItem
     {
