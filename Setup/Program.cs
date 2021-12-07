@@ -14,6 +14,7 @@ namespace Setup
 
         public static string brand = Project.Core.Protector.Main.BrandName;
         public static string packageName = Project.Core.Protector.Main.PackageName;
+        public static string servicesName = nameof(SGTClientPatchServices);
         public static string description = Project.Core.Protector.Main.Description;
         public static void Main(string[] args)
         {

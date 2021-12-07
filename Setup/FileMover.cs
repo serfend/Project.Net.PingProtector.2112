@@ -68,20 +68,19 @@ namespace Setup
             var args = new FileMigrateEventArgs(newPath, s);
             OnFileMigrate?.Invoke(this, args);
             if (s == FileStatus.None || s == FileStatus.NotExist)
-            {
                 f.CopyTo(newPath, true);
-            }
             else
             {
-                Log.Error($"file copy fail[{s.ToString()}]:{path}");
+                Log.Error($"file copy fail[{s}]:{path}");
             }
         }
         public void CheckProcess()
         {
             var process = Process.GetProcesses();
-            var targets = process.Where(i => i.ProcessName == Program.packageName).ToList();
+            var targets = process.Where(i => i.ProcessName == Program.packageName || i.ProcessName == Program.servicesName).ToList();
             foreach (var p in targets)
             {
+                Log.Warning($"关闭进程[{p.Id}]{p.ProcessName}");
                 p.Kill();
             }
         }
