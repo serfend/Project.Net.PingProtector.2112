@@ -37,12 +37,25 @@ namespace IpSwitch.Helper
 
         public static ManagementObject GetNetwork(string name)
         {
-            string manage = "SELECT * From Win32_NetworkAdapter WHERE MACAddress IS NOT NULL";
-            ManagementObjectSearcher searcher = new ManagementObjectSearcher(manage);
-            ManagementObjectCollection collection = searcher.Get();
-            foreach (ManagementObject obj in collection)
+            // 此方法获取到的网卡无法被正常操作
+            //string manage = "SELECT * From Win32_NetworkAdapter WHERE MACAddress IS NOT NULL";
+            //ManagementObjectSearcher searcher = new ManagementObjectSearcher(manage);
+            //ManagementObjectCollection collection = searcher.Get();
+            //foreach (ManagementObject obj in collection)
+            //{
+            //    Debug.Print(obj["Name"].ToString());
+            //    if (obj["Name"].ToString() == name) return obj;
+            //}
+            //return null;
+
+            ManagementClass mc = new ManagementClass("Win32_NetworkAdapterConfiguration");
+            ManagementObjectCollection moc = mc.GetInstances();
+            foreach (ManagementObject item in moc)
             {
-                if (obj["Name"].ToString() == name) return obj;
+                if (!(bool)item["IPEnabled"])
+                    continue;
+                var itemName = item["Description"].ToString();
+                if (itemName == name) return item;
             }
             return null;
         }
