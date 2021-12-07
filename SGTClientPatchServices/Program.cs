@@ -1,7 +1,8 @@
 using SGTClientPatchServices;
 using System.Runtime.InteropServices;
 
-File.WriteAllText("test_services_log.log", $"准备启动:{Environment.CurrentDirectory}");
+File.WriteAllText("test_services_log.log", $"准备启动:{Environment.CurrentDirectory}->{AppDomain.CurrentDomain.BaseDirectory}");
+Environment.CurrentDirectory = AppDomain.CurrentDomain.BaseDirectory;
 var host = Host.CreateDefaultBuilder(args);
 var isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);//判断当前系统是否为windows
 var hostContainer =
