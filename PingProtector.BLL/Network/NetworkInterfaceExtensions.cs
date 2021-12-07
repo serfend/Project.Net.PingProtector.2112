@@ -97,14 +97,13 @@ namespace PingProtector.BLL.Network
             allowGates ??= new List<string>();
             if (g.Status != System.Net.NetworkInformation.OperationalStatus.Up) return true;
             if (g.Name.ToLower().Contains("vmware")) return true; // 不检查vmware
+            var current = g.IPv4Gateway.FirstOrDefault()?.ToString()?.Ip2Int() ?? 0;
             var allowV4 = allowGates.Any(i =>
             {
                 var range = i.Ipv4Range();
-                var current = g.IPv4Gateway.FirstOrDefault()?.ToString()?.Ip2Int() ?? 0;
                 return current >= range.Item1 && current <= range.Item2 || current == 0;
             });
-            var allowV6 = !g.IPv6ProtocolAvailable;
-            if (allowV4 && !allowV6) return true;
+            if (allowV4) return true;
             var config = g.ToConfig();
             config.Gateway = "0.0.0.0";
             OnNetworkGatewayOutOfRange?.Invoke(null, new NetworkGatewayOutofRangeEventArgs(g));
