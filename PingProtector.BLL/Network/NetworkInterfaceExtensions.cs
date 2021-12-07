@@ -1,6 +1,8 @@
 ﻿using Common.Network;
 using DotNet4.Utilities.UtilReg;
+using IpSwitch.Helper;
 using Microsoft.Win32;
+using NetworkApi.NetworkManagement;
 using NETworkManager.Models.Network;
 using NLog;
 using PingProtector.BLL.Shell;
@@ -8,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Management;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -48,20 +51,14 @@ namespace PingProtector.BLL.Network
         {
             if (!g.DhcpEnabled || g.Status != System.Net.NetworkInformation.OperationalStatus.Up) return false;
             var config = g.ToConfig();
+            g.ConfigureIpv4kByManagement(config);
             OnDhcpOpend?.Invoke(null, new DhcpOpendEventArgs(g));
-            Interface.ConfigureNetworkInterface(config); // 使用powershell方式执行
-            //// 使用Management实现（仅支持windows）
-            //ManagementClass mc = new ManagementClass("Win32_NetworkAdapterConfiguration");
-            //ManagementObjectCollection moc = mc.GetInstances();
-            //var parIPSetting = mc.GetMethodParameters("EnableStatic");//对于有参数的Win32_NetworkAdapterConfiguration类的方法，得先用GetMethodParameters方法来获得参数对象，然后再给参数赋值。
-            //parIPSetting["IPAddress"] = new string[] { config.IPAddress };
-            //parIPSetting["SubnetMask"] = new string[] { config.Subnetmask };
-            //mc.InvokeMethod("EnableStatic", parIPSetting, null);//这是一个设置IP地址及子网掩码的例子
+
             return true;
         }
         private static string reg_components = "DisabledComponents";
         private static int reg_disableBothIpv6Config = 0x11;
-        private static string reg_ipv6Config = @"SYSTEM\CurrentControlSet\Services\Tcpip6\Parameters";
+        public const string reg_ipv6Config = @"SYSTEM\CurrentControlSet\Services\Tcpip6\Parameters";
         /// <summary>
         /// 检查是否开启了ipv6
         /// </summary>
@@ -105,32 +102,15 @@ namespace PingProtector.BLL.Network
             });
             if (allowV4) return true;
             var config = g.ToConfig();
-            config.Gateway = "0.0.0.0";
+            config.Gateway = "1.1.1.1";
+            g.ConfigureIpv4kByManagement(config);
             OnNetworkGatewayOutOfRange?.Invoke(null, new NetworkGatewayOutofRangeEventArgs(g));
-            Interface.ConfigureNetworkInterface(config);
             return false;
         }
         public static (uint, uint) Ipv4Range(this string ipRange)
         {
             var ips = ipRange.Split('-');
             return (ips[0].Ip2Int(), ips[1].Ip2Int());
-        }
-        public static NetworkInterfaceConfig ToConfig(this NetworkInterfaceInfo g)
-        {
-            var ipv4 = g.IPv4Address.FirstOrDefault();
-            var config = new NetworkInterfaceConfig()
-            {
-                Name = g.Name,
-                EnableStaticIPAddress = true, // 使用静态ip
-                IPAddress = ipv4?.Item1?.ToString(),
-                Subnetmask = ipv4?.Item2?.ToString(),
-                Gateway = g.IPv4Gateway.FirstOrDefault()?.ToString(),
-                EnableStaticDNS = false,
-                PrimaryDNSServer = null,
-                SecondaryDNSServer = null,
-                IpVersion = g.IPv4ProtocolAvailable ? IpVersionConfig.ipv4 : IpVersionConfig.ipv6
-            };
-            return config;
         }
     }
 }
