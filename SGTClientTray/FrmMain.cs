@@ -1,10 +1,17 @@
 namespace SGTClientTray
 {
-    public partial class Form1 : Form
+    public partial class FrmMain : Form
     {
-        public Form1()
+        public FrmMain()
         {
             InitializeComponent();
+        }
+
+        private void FrmMain_Load(object sender, EventArgs e)
+        {
+            // 实现托盘常驻，并与主进程互通数据
+
+
         }
     }
 }
