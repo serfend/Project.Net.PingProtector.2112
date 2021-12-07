@@ -21,9 +21,9 @@ namespace Configuration.FileHelper
         public byte[] IV { get; set; } = new byte[] { 0xde, 0xad, 0xbe, 0xef, 0x00, 0x01, 0x02, 0x03, 0xbe, 0xef, 0x00, 0x01, 0x01, 0x02, 0x03, 0xbe };
         public string? Content { set; get; }
 
-        public void Load()
+        public string? Load()
         {
-            if (!File.Exists(Path)) return;
+            if (!File.Exists(Path)) return null;
             try
             {
                 using (Aes aesAlg = Aes.Create())
@@ -36,11 +36,13 @@ namespace Configuration.FileHelper
                     using var cs = new CryptoStream(fs, encryptor, CryptoStreamMode.Read);
                     using var sr = new StreamReader(cs);
                     Content = sr.ReadToEnd();
+                    return Content;
                 }
             }
             catch (Exception)
             {
             }
+            return null;
         }
         public void Save()
         {
