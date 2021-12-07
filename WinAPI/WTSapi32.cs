@@ -40,6 +40,8 @@ namespace WinAPI
         [Flags]
         public enum DialogStyle : long
         {
+            None = -1,
+            Default = 0,
             MB_YESNOCANCEL = 0x00000003L,
             MB_YESNO = 0x00000004L,
             MB_RETRYCANCEL = 0x00000005L,
