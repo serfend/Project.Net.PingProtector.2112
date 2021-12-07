@@ -77,7 +77,7 @@ namespace DotNet4.Utilities
 			/// <summary>
 			/// 立即实例化本节点
 			/// </summary>
-			private RegistryKey InnerKey
+			public RegistryKey InnerKey
 			{
 				get
 				{
@@ -157,7 +157,6 @@ namespace DotNet4.Utilities
 			#endregion 构造函数
 
 			#region 公有方法
-
 			/// <summary>
 			/// 进入到它的子节点 node.in(childName).in(childChildName)...，当不命名时进入自己路径的一个新的实例
 			/// </summary>
