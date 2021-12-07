@@ -30,8 +30,14 @@ namespace CipperGenerator
         {
             frmSettingFile.Load();
             var c = frmSettingFile.Content;
-            Config = JsonSerializer.Deserialize<FrmConfig>((((c?.Length ?? 0) == 0) ? "{}" :c) ?? "{}");
-            TxtFile.Text = Config?.TxtFile;
+            try
+            {
+                Config = JsonSerializer.Deserialize<FrmConfig>((((c?.Length ?? 0) == 0) ? "{}" : c) ?? "{}");
+                TxtFile.Text = Config?.TxtFile;
+            }
+            catch (Exception)
+            {
+            }
         }
 
         private void FrmMain_Resize(object sender, EventArgs e)

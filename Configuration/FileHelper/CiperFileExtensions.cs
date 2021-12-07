@@ -45,8 +45,8 @@ namespace Configuration.FileHelper
         public void Save()
         {
             if (Path == null) return;
-            if (!File.Exists(Path))
-                File.WriteAllText(Path, String.Empty);
+
+            File.WriteAllText(Path, String.Empty);
             try
             {
                 using (Aes aesAlg = Aes.Create())
