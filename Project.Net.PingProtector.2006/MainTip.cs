@@ -1,5 +1,6 @@
 ﻿using Configuration.AutoStratManager;
 using IpSwitch.Helper;
+using NetworkApi.NetworkManagement;
 using NETworkManager.Models.Network;
 using NLog;
 using PingProtector.BLL.Network;
@@ -23,10 +24,12 @@ namespace Project.Core.Protector
 
         private void ShowTip(string item, int? dialogStyle, NetworkEventArgs e, Func<bool> beforeTipAndHideMessageBox, Action afterTip)
         {
-            var msg = e.Interface.ToSummary();
-            detectorLogger.Log<string>(LogLevel.Warn, $"[{item}]{msg}:{e.Interface.ToDetail()}");
+            if (dialogStyle == 0) dialogStyle = null;
+             var msg = e.Interface.ToSummary();
+            var content = item.Replace("{summary}", msg);
+            detectorLogger.Log<string>(LogLevel.Warn, $"{content}:{e.Interface.ToDetail()}");
             if (beforeTipAndHideMessageBox?.Invoke() ?? false) return;
-            WTSapi32.ShowMessageBox(item.Replace("{summary}", msg), BrandName, (WTSapi32.DialogStyle)(dialogStyle ?? (int)(WTSapi32.DialogStyle.MB_OK | WTSapi32.DialogStyle.MB_ICONERROR)));
+            WTSapi32.ShowMessageBox(content, BrandName, (WTSapi32.DialogStyle)(dialogStyle ?? ((int)WTSapi32.DialogStyle.MB_OK + (int)WTSapi32.DialogStyle.MB_ICONERROR)));
             afterTip?.Invoke();
         }
         private void TipInit()
@@ -56,9 +59,9 @@ namespace Project.Core.Protector
             fetcher.OnNewCmdReceived += Fetcher_OnNewCmdReceived;
         }
 
-        public void StartOutterAction(List<NetworkInterfaceInfo> interfaces)
+        public void StartOutterAction(List<NetworkInterfaceInfo>? interfaces = null)
         {
-
+            interfaces ??= networkInfo.CheckInterfaces();
             Task.Run(() =>
             {
                 var tip = ProjectI18n.Default?.Current?.Notification?.OuterNetworkDetected;
@@ -70,7 +73,7 @@ namespace Project.Core.Protector
             });
             interfaces.ForEach(i =>
             {
-                var netObj = NetworkAdapter.GetNetwork(i.Name);
+                var netObj = i.GetObjectByName();
                 NetworkAdapter.DisableNetWork(netObj);
             });
         }
