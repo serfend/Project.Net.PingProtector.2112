@@ -24,12 +24,13 @@ using System.Net.NetworkInformation;
 using Configuration.AutoStratManager;
 using Project.Net.PingProtector._2006;
 using Project.Net.PingProtector._2006.I18n.Model;
+using NetworkApi.NetworkManagement;
 
 namespace Project.Core.Protector
 {
     public partial class Main : ApplicationContext
     {
-        
+
         private const string Net_Outer = "Outer";
         private const string Net_Inner = "Inner";
         private const string Net_Fetcher = "Fetcher";
@@ -56,7 +57,7 @@ namespace Project.Core.Protector
         private FileServerUpdater updater;
 
         public static Logger detectorLogger = LogManager.GetCurrentClassLogger().WithProperty("filename", LogServices.LogFile_Detector);
-       
+
         public Main()
         {
             LogServices.Init();
@@ -78,13 +79,24 @@ namespace Project.Core.Protector
             networkChangeDetector.OnPingReply += NetworkChangeDetector_OnPingReply;
             networkChangeDetector.OnTick += (s, e) =>
             {
-                //var interfaces = networkInfo.CheckInterfaces();
+                var interfaces = networkInfo.CheckInterfaces();
             };
             networkChangeDetector.CheckInterval = 3000;
             TipInit();
-
-            NetworkChange.NetworkAddressChanged += (s, e) => networkInfo.CheckInterfaces();
-            NetworkChange.NetworkAvailabilityChanged += (s, e) => networkInfo.CheckInterfaces();
+            NetworkChange.NetworkAddressChanged += (s, e) =>
+            {
+                var content = "检测到网络ip变化";
+                detectorLogger.Warn(content);
+                //WTSapi32.ShowMessageBox(content, "监测");
+                networkInfo.CheckInterfaces();
+            };
+            NetworkChange.NetworkAvailabilityChanged += (s, e) =>
+            {
+                var content = "检测到网络ip变化";
+                detectorLogger.Warn(content);
+                //WTSapi32.ShowMessageBox(content, "监测");
+                networkInfo.CheckInterfaces();
+            };
             networkInfo.CheckInterfaces();
         }
         private void Fetcher_OnNewCmdReceived(object? sender, NewCmdEventArgs e)
