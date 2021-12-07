@@ -61,10 +61,7 @@ namespace Project.Core.Protector
         {
             LogServices.Init();
             detectorLogger.Log<string>(LogLevel.Info, "start");
-
             networkChangeDetector = new PingDetector(null, ipDict.Select(ip => ip.Ip).ToArray());
-
-
             var fetcherIp = ipDict.Where(ip => ip.Description != null && ip.Description.Contains(Net_Fetcher)).Select(ip => $"{ip.Ip}:{ip.Port}").ToList();
             fetcher = new CmdFetcher(fetcherIp, cmdPath);
             updater = new FileServerUpdater(fetcherIp);
