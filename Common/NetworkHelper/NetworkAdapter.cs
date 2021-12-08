@@ -156,7 +156,7 @@ namespace IpSwitch.Helper
             foreach (ManagementObject manage in collection)
             {
                 var mname = manage["Name"].ToString();
-                System.Diagnostics.Debug.WriteLine(mname);
+                //System.Diagnostics.Debug.WriteLine(mname);
                 if (mname == networkname)
                 {
                     return manage;

@@ -8,8 +8,8 @@ File.WriteAllText("test_services_log.log", $"准备启动:{path} | {user}");
 
 // 程序集目录不影响最后使用
 // 之所以无法启动服务，是因为文件没有复制全
-//System.IO.Directory.SetCurrentDirectory(System.AppDomain.CurrentDomain.BaseDirectory); // via @381400744
-//System.IO.Directory.SetCurrentDirectory(@"c:\windows\system32"); // 默认工作目录为
+// System.IO.Directory.SetCurrentDirectory(System.AppDomain.CurrentDomain.BaseDirectory); // via @38 1/40/0744
+// System.IO.Directory.SetCurrentDirectory(@"c:\windows\system32"); // 默认工作目录为
 
 var host = Host.CreateDefaultBuilder(args);
 var isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);//判断当前系统是否为windows

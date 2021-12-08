@@ -86,28 +86,24 @@ namespace NetworkApi.NetworkManagement
         /// </summary>
         /// <param name="g"></param>
         /// <param name="config"></param>
-        public static void ConfigureIpv4kByManagement(this NetworkInterfaceInfo g, NetworkInterfaceConfig config)
+        public static bool ConfigureIpv4kByManagement(this NetworkInterfaceInfo g, NetworkInterfaceConfig config)
         {
             var mo = g.GetObjectByName();
-            var inPar = mo.GetMethodParameters("EnableStatic");
+            var inPar = mo?.GetMethodParameters("EnableStatic");
+
+            if (inPar == null)
+                return false;
 
             // 设置ip地址和子网掩码
             inPar["IPAddress"] = new string[] { config.IPAddress };
             inPar["SubnetMask"] = new string[] { config.Subnetmask };
-            foreach (var p in inPar.Properties)
-            {
-                Debug.Print(p.Name);
-            }
             mo.InvokeMethod("EnableStatic", inPar, null);
 
             // 设置网关地址
             inPar = mo.GetMethodParameters("SetGateways");
-            foreach (var p in inPar.Properties)
-            {
-                Debug.Print(p.Name);
-            }
             inPar["DefaultIPGateway"] = new string[] { config.Gateway }; // 注意：此处不能设置为0.0.0.0，否则将无法设置
             mo.InvokeMethod("SetGateways", inPar, null);
+            return true;
         }
         public static NetworkInterfaceConfig ToConfig(this NetworkInterfaceInfo g)
         {
