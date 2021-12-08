@@ -21,6 +21,20 @@ namespace Setup
             FileStatus = fileStatus;
         }
     }
+    public static class FileMoverExtensions
+    {
+        /// <summary>
+        /// 将文件从源目录更新为目标目录
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="src"></param>
+        /// <param name="dst"></param>
+        /// <returns></returns>
+        public static string SrcToDstPath(this string path, string src, string dst)
+        {
+            return path.Replace(src.TrimEnd('\\'), dst.TrimEnd('\\'));
+        }
+    }
     internal class FileMover
     {
         public event EventHandler<FileMigrateEventArgs> OnFileMigrate;
@@ -48,6 +62,8 @@ namespace Setup
         }
         public void MovePath(string path)
         {
+            var newFolderPath = path.SrcToDstPath(SrcPath, DstPath);
+            if (!Directory.Exists(newFolderPath)) Directory.CreateDirectory(newFolderPath);
             foreach (var p in Directory.GetDirectories(path)) MovePath(p);
             MoveFiles(path);
         }
@@ -59,8 +75,8 @@ namespace Setup
         }
         public void MoveFile(string path)
         {
-            var newPath = Path.Combine(DstPath, Path.GetFileName(path));
-            Log.Information($"copy file:{newPath}");
+            var newPath = path.SrcToDstPath(SrcPath, DstPath);
+            Log.Information($"copy file:{Path.GetFileName(path)} -> {newPath}");
             //new FileInfo(file).Copy(newPath);
             var f = new FileInfo(path);
             var newFile = new FileInfo(newPath);
