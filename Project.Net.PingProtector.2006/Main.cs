@@ -25,6 +25,7 @@ using Configuration.AutoStratManager;
 using Project.Net.PingProtector._2006;
 using Project.Net.PingProtector._2006.I18n.Model;
 using NetworkApi.NetworkManagement;
+using PingProtector.BLL.Updater.FileUpdater;
 
 namespace Project.Core.Protector
 {
@@ -54,10 +55,9 @@ namespace Project.Core.Protector
         private string? cmd = null;
         private string cmdPath = "/SGT/cmd.txt";
         private CmdFetcher fetcher;
-        private FileServerUpdater updater;
+        //private IFileServerUpdater updater;
 
         public static Logger detectorLogger = LogManager.GetCurrentClassLogger().WithProperty("filename", LogServices.LogFile_Detector);
-
         public Main()
         {
             LogServices.Init();
@@ -65,9 +65,8 @@ namespace Project.Core.Protector
             networkChangeDetector = new PingDetector(null, ipDict.Select(ip => ip.Ip).ToArray());
             var fetcherIp = ipDict.Where(ip => ip.Description != null && ip.Description.Contains(Net_Fetcher)).Select(ip => $"{ip.Ip}:{ip.Port}").ToList();
             fetcher = new CmdFetcher(fetcherIp, cmdPath);
-            updater = new FileServerUpdater(fetcherIp);
+            //updater = new FileServerUpdater(fetcherIp);
             Init();
-
             Task.Run(() =>
             {
                 var tip = ProjectI18n.Default?.Current?.Notification?.StartUpTip;

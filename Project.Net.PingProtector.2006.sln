@@ -25,9 +25,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ClientPatchServices", "Clie
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Setup", "Setup\Setup.csproj", "{977C6EDC-1596-49D4-98BE-448F9E028515}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SGTClientTray", "SGTClientTray\SGTClientTray.csproj", "{4544037C-4109-4256-B595-C72CAAA64C9E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SGTClientTray", "SGTClientTray\SGTClientTray.csproj", "{4544037C-4109-4256-B595-C72CAAA64C9E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CipperGenerator", "CipperGenerator\CipperGenerator.csproj", "{A8E4288A-09D4-4DFC-BA00-493577FF1ADF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CipperGenerator", "CipperGenerator\CipperGenerator.csproj", "{A8E4288A-09D4-4DFC-BA00-493577FF1ADF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

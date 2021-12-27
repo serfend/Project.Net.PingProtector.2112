@@ -11,9 +11,12 @@ using System.Threading;
 
 namespace PingProtector.BLL.Updater
 {
-    public class FileServerUpdater
+    /// <summary>
+    /// 仅单文件部署更新时有效
+    /// </summary>
+    public class SingleFileServerUpdater
     {
-        public const string UpdatePath = "/file/load?filepath=/tools/sgt&filename=everynet.exe";
+        public const string UpdatePath = "/file/load?filepath=/tools/sgt&filename=setup.txt";
         private const string DownLoadPath = "/file/staticFile/";
         private List<string> Host { get; set; }
         private Reg updateRecord = new Reg().In("setting");
@@ -21,8 +24,11 @@ namespace PingProtector.BLL.Updater
         public event EventHandler<NewVersionEventArgs> OnNewVersion;
 
         public Timer checkUpdate;
-
-        public FileServerUpdater(List<string> host)
+        /// <summary>
+        /// 用于自动检查更新
+        /// </summary>
+        /// <param name="host"></param>
+        public SingleFileServerUpdater(List<string> host)
         {
             this.Host = host;
             Task.Run(() => {
