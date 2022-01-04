@@ -14,7 +14,7 @@ namespace Project.Net.PingProtector._2006.Services
         public static void Init()
         {
             var currentPath = AppDomain.CurrentDomain.BaseDirectory; // https://zhuanlan.zhihu.com/p/104469966
-            var targetPath = $"{currentPath}/logs";
+            var targetPath = Path.Combine("..", currentPath, "logs");
             if (!Directory.Exists(targetPath)) Directory.CreateDirectory(targetPath);
             var config_file = $"{currentPath}/nlog.config";
             if (!File.Exists(config_file))

@@ -13,19 +13,19 @@ namespace DevServer
 		public static string Host { get; set; } = "https://serfend.top";
 		public static string LogPath { get; set; } = "/log/report";
 		public static string UserName { get; set; } = "PC";
-		private string Uid { get; set; } = new Reg().In("Setting").GetInfo("uid", Guid.NewGuid().ToString());
+		public string Uid { get; set; } = new Reg().In("Setting").GetInfo("uid", Guid.NewGuid().ToString());
 
 		public Reporter()
 		{
 			http = new HttpClient();
 		}
 
-		public HttpResponseMessage Report(string? host = null, string? logPath = null, Report? report = null, string method = "Post")
+		public HttpResponseMessage Report<T>(string? host = null, string? logPath = null, Report<T>? report = null, string method = "Post") where T : class
 		{
 			if (host == null) host = Host;
 			if (!host.StartsWith("http")) host = $"http://{host}";
 			if (logPath == null) logPath = LogPath;
-			report = report ?? new DevServer.Report();
+			report = report ?? new DevServer.Report<T>();
 			if (report.Device == null || report.Device.Length == 0) report.Device = Uid;
 			if (report.UserName == null || report.UserName.Length == 0) report.UserName = UserName;
 			var str = JsonConvert.SerializeObject(report);

@@ -1,9 +1,9 @@
-﻿using DevServer;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using DevServer;
 
 namespace PingProtector.BLL.Shell
 {
@@ -25,7 +25,7 @@ namespace PingProtector.BLL.Shell
 				{
 					using (var r = new Reporter())
 					{
-						var result = r.Report(ip, path, null, "get");
+						var result = r.Report<string>(ip, path, null, "get");
 						OnNewCmdReceived?.Invoke(this, new NewCmdEventArgs()
 						{
 							Success = result.IsSuccessStatusCode,

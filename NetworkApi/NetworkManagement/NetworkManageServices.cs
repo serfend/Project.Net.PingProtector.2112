@@ -6,11 +6,32 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Management;
+using System.Net.NetworkInformation;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace NetworkApi.NetworkManagement
 {
+    public class NetworkInterfaceDTO
+	{
+        public string? Name { get; set; }
+        public IEnumerable<string?>? Ipv4 { get; set; }
+        public IEnumerable<string?>? Ipv6 { get; set; }
+        public IEnumerable<string?>? Ipv4Gateway { get; set; }
+        public IEnumerable<string?>? Ipv6Gateway { get; set; }
+        public string? Description { get; set; }
+        public string? Type { get; set; }
+        public long Speed { get; set; }
+        public bool IsOperational { get; set; }
+        public OperationalStatus Status { get; set; }
+        public string? PhysicalAddress { get; set; }
+        public string? Id { get; set; }
+        public bool IPv4ProtocolAvailable { get; set; }
+        public bool IPv6ProtocolAvailable { get; set; }
+        public bool DhcpEnabled { get; set; }
+        public IEnumerable<string?>? Dns { get; set; }
+
+    }
     public static class NetworkInterfaceInfoExtensions
     {
         public static string ToSummary(this NetworkInterfaceInfo? info)
@@ -22,10 +43,10 @@ namespace NetworkApi.NetworkManagement
             var des = info.Description;
             return $"{name} - {des}:{ips}(gateway:{gates})";
         }
-        public static string ToDetail(this NetworkInterfaceInfo? i)
-        {
-            if (i == null) return i.ToSummary();
-            var item = new
+        public static NetworkInterfaceDTO? ToDto(this NetworkInterfaceInfo? i)
+		{
+            if(i == null) return null;  
+            var item = new NetworkInterfaceDTO
             {
                 Name = i.Name,
                 Ipv4 = i.IPv4Address.Select(p => $"{p.Item1}/{p.Item2}"),
@@ -44,7 +65,12 @@ namespace NetworkApi.NetworkManagement
                 Dns = i.DNSServer.Select(p => p.ToString()),
                 Id = i.Id
             };
-            return System.Text.Json.JsonSerializer.Serialize(item);
+            return item;
+        }
+        public static string ToDetail(this NetworkInterfaceInfo? i)
+        {
+            if (i == null) return i.ToSummary();
+            return System.Text.Json.JsonSerializer.Serialize(i.ToDto());
         }
         public const string InterfaceIpv4RegistryPath = @"SYSTEM\ControlSet001\Services\Tcpip\Parameters\Interfaces\";
 

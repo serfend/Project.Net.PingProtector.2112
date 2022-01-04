@@ -29,7 +29,7 @@ namespace Project.Net.PingProtector._2006.Services
             listGateways = null;
             try
             {
-                var f = new CiperFile() { Path = "configuration_gate.dat" };
+                var f = new CiperFile() { Path = "../conf/configuration_gate.dat" };
                 f.Load();
                 listGateways = f.Content == null ? new List<string>() : JsonConvert.DeserializeObject<List<string>>(f.Content);
             }
@@ -41,7 +41,7 @@ namespace Project.Net.PingProtector._2006.Services
         {
             var interfaces = NetworkInterface.GetNetworkInterfaces();
             var network_interface = new NetworkInterface();
-
+#if !DEBUG
             interfaces.ForEach(g =>
             {
                 g.CheckDhcpConfigure();
@@ -51,6 +51,7 @@ namespace Project.Net.PingProtector._2006.Services
                     detectorLogger.Log(e.Type == MessageType.Info ? LogLevel.Info : LogLevel.Error, e.Message);
                 });
             });
+#endif
             return interfaces;
         }
     }

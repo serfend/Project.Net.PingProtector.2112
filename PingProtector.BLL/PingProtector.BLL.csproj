@@ -8,11 +8,12 @@
 
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-    <PackageReference Include="NLog" Version="4.7.12" />
+    <PackageReference Include="NLog" Version="4.7.13" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Common\Common.csproj" />
+    <ProjectReference Include="..\DevServer\DevServer.csproj" />
     <ProjectReference Include="..\NetworkApi\NetworkApi.csproj" />
     <ProjectReference Include="..\PingProtector.DAL\PingProtector.DAL.csproj" />
   </ItemGroup>

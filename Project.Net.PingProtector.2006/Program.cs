@@ -1,3 +1,4 @@
+using Common.Extensions;
 using Configuration.AutoStratManager;
 using Project.Core.Protector;
 using Project.Net.PingProtector._2006.I18n;
@@ -31,15 +32,15 @@ namespace Project.Net.PingProtector._2006
             }
             catch (Exception ex)
             {
-                WTSapi32.ShowMessageBox(ex.Message + "\n" + ex.StackTrace, "主线异常", WTSapi32.DialogStyle.MB_OK | WTSapi32.DialogStyle.MB_ICONERROR);
-
+                var result = ex.ToSummary();
+                WTSapi32.ShowMessageBox(result, "主线异常", WTSapi32.DialogStyle.MB_OK | WTSapi32.DialogStyle.MB_ICONERROR);
             }
         }
 
 
         private static void Application_ThreadException(object sender, ThreadExceptionEventArgs e)
         {
-            WTSapi32.ShowMessageBox($"{e.Exception.Message}\n{e.Exception.StackTrace}", "线程错误", WTSapi32.DialogStyle.MB_OK | WTSapi32.DialogStyle.MB_ICONERROR);
+            WTSapi32.ShowMessageBox(e.Exception.ToSummary(), "线程错误", WTSapi32.DialogStyle.MB_OK | WTSapi32.DialogStyle.MB_ICONERROR);
         }
 
         private static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
