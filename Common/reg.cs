@@ -123,7 +123,7 @@ namespace DotNet4.Utilities
 			/// <param name="subKey"></param>
 			public Reg(string subKey, string root = @"software\serfend")
 			{
-				SetNode(root + "\\" + subKey, RegDomain.CurrentUser);
+				SetNode($"{root}\\{subKey}", RegDomain.CurrentUser);
 			}
 
 			/// <summary>
@@ -168,7 +168,7 @@ namespace DotNet4.Utilities
 				{
 					return new Reg(this);
 				}
-				return new Reg(string.Format(@"{0}\{1}", _subkey, childNodeName), _domain);
+				return new Reg($"{_subkey}\\{childNodeName}", _domain);
 			}
 
 			/// <summary>
@@ -178,20 +178,20 @@ namespace DotNet4.Utilities
 			/// <returns></returns>
 			public virtual bool Delete(string subKey)
 			{
-				bool result = false;
+				var success = false;
 				if (subKey == string.Empty || subKey == null) return false;
 				RegistryKey key = InnerKey;
 				try
 				{
 					key.DeleteSubKey(subKey);
-					result = true;
+					success = true;
 				}
 				catch
 				{
-					result = false;
+					success = false;
 				}
 				key.Close();
-				return result;
+				return success;
 			}
 
 			public virtual bool SetInfo(string? name, object? content)
@@ -203,40 +203,37 @@ namespace DotNet4.Utilities
 			{
 				if (string.IsNullOrEmpty(name)) { return false; }
 				RegistryKey key = InnerKey;
-				bool result = false;
+				var success = false;
 				try
 				{
 					key.SetValue(name, content, GetRegValueKind(regValueKind));
-					result = true;
+					success = true;
 				}
 				catch (Exception ex)
 				{
-					result = false;
+					success = false;
 				}
 				finally
 				{
 					key.Close();
 				}
-				return result;
+				return success;
 			}
 
-			public virtual string GetInfo(string name)
-			{
-				return GetInfo(name, null);
-			}
+			public virtual string GetInfo(string name) => GetInfo(name, null);
 
-			public virtual string GetInfo(string name, string defaultInfo)
+			public virtual string GetInfo(string name, string? defaultInfo)
 			{
 				if (name == string.Empty || name == null) { return ""; }
 				RegistryKey key = InnerKey;
-				object rel = key.GetValue(name);
+				var rel = key.GetValue(name);
 				key.Close();
 				if (rel == null || rel.ToString().Length == 0)
 				{
 					this.SetInfo(name, defaultInfo);
 					return defaultInfo;
 				}
-				string tmp = rel.ToString();
+				var tmp = rel.ToString();
 				if (tmp.Contains("\0")) tmp = tmp.Substring(0, tmp.ToString().IndexOf('\0'));
 				return tmp;
 			}
