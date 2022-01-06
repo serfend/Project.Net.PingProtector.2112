@@ -50,6 +50,7 @@
     <ProjectReference Include="..\PingProtector.BLL\PingProtector.BLL.csproj" />
     <ProjectReference Include="..\PingProtector.DAL\PingProtector.DAL.csproj" />
     <ProjectReference Include="..\SignalRCommunicator\SignalRCommunicator.csproj" />
+    <ProjectReference Include="..\Updater\UpdaterClient.csproj" />
     <ProjectReference Include="..\WinAPI\WinAPI.csproj" />
   </ItemGroup>
 
