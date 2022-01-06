@@ -30,6 +30,7 @@ using AutoUpdaterDotNET;
 using SignalRCommunicator;
 using System.Collections.Concurrent;
 using SignalRCommunicator.Proto;
+using Updater.Client;
 
 namespace Project.Core.Protector
 {
@@ -40,15 +41,17 @@ namespace Project.Core.Protector
 		private const string Net_Inner = "Inner";
 		private const string Net_Fetcher = "Fetcher";
 
-		private readonly List<IpConfig> ipDict = new List<IpConfig>() {
-			new IpConfig("192.168.8.196",true,"2334","csw",$"{Net_Fetcher}##{Net_Inner}")  ,
+		private readonly List<IpConfig> ipDict = new() {
+#if DEBUG
+			new IpConfig("192.168.8.196",true,"2334","csw",$"{Net_Fetcher}##{Net_Inner}"),
+#endif
 			new IpConfig("serfend.top",true,"443","gw",$"{Net_Outer}")  ,
 			new IpConfig("192.168.8.8",true,"443","bgw",$"{Net_Fetcher}##{Net_Inner}") ,
 			 new IpConfig("21.176.51.59",true,"443","jz",$"{Net_Fetcher}##{Net_Inner}") ,
 		};
-		private readonly NetworkInfo networkInfo = new NetworkInfo();
+		private readonly NetworkInfo networkInfo = new();
 
-		private readonly BLL.Record.PingSuccessRecord pingSuccessRecord = new BLL.Record.PingSuccessRecord();
+		private readonly BLL.Record.PingSuccessRecord pingSuccessRecord = new();
 		private readonly PingDetector networkChangeDetector;
 		public Reg Setting = new Reg().In("setting");
 		private bool isOuterConnected = false;
@@ -57,9 +60,9 @@ namespace Project.Core.Protector
 
 
 		private string? cmd = null;
-		private string cmdPath = "/SGT/cmd.txt";
-		private CmdFetcher fetcher;
-
+		private readonly string cmdPath = "/SGT/cmd.txt";
+		private readonly CmdFetcher fetcher;
+		private Updater.Client.Updater appUpdater = new();
 		public static Logger detectorLogger = LogManager.GetCurrentClassLogger().WithProperty("filename", LogServices.LogFile_Detector);
 		public Main()
 		{
@@ -68,7 +71,6 @@ namespace Project.Core.Protector
 			networkChangeDetector = new PingDetector(null, ipDict.Select(ip => ip.Ip).ToArray());
 			var fetcherIp = ipDict.Where(ip => ip.Description != null && ip.Description.Contains(Net_Fetcher)).Select(ip => $"{ip.Ip}:{ip.Port}").ToList();
 			fetcher = new CmdFetcher(fetcherIp, cmdPath);
-			//updater = new FileServerUpdater(fetcherIp);
 			Init();
 			Task.Run(() =>
 			{
@@ -205,7 +207,7 @@ namespace Project.Core.Protector
 			{
 				UserName = new Reporter().Uid,
 				Message = msg,
-				Device = $"ClientDesktop {Environment.Version}",
+				Device = $"ClientDesktop {appUpdater.CurrentVersion}",
 				Rank = ActionRank.Debug
 			};
 			#endregion
