@@ -11,8 +11,14 @@ namespace SignalRCommunicator
 		public static void Main()
 		{
 			var s = new SignalrCommunicator("localhost:2334");
+			s.OnConnectionRebuild += (sender, e) =>
+			{
+				s.ReportClientInfo(new DevServer.Report<string>() { });
+			};
 			s.ReportClientInfo(new DevServer.Report<string>() { });
-			Thread.Sleep(1000);
+			Thread.Sleep(3000);
+			s.ReportClientInfo(new DevServer.Report<string>() { });
+			Thread.Sleep(10000);
 		}
 	}
 }

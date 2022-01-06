@@ -65,8 +65,9 @@ namespace IpSwitch.Helper
         /// </summary>
         /// <param name="netWorkName">网卡名</param>
         /// <returns></returns>
-        public static NetworkHandleState DisableNetWork(ManagementObject network)
+        public static NetworkHandleState DisableNetWork(ManagementObject? network)
         {
+            if (network == null) return NetworkHandleState.InvalidOperation;
             try
             {
                 var result = network.InvokeMethod("Disable", null);
@@ -169,7 +170,8 @@ namespace IpSwitch.Helper
         {
             Success = 0,
             PermissionDenied = 5,
-            Fail = -1
+            Fail = -1,
+            InvalidOperation = -2
         }
     }
 }

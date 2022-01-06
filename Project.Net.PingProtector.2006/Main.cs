@@ -27,9 +27,9 @@ using Project.Net.PingProtector._2006.I18n.Model;
 using NetworkApi.NetworkManagement;
 using PingProtector.BLL.Updater.FileUpdater;
 using AutoUpdaterDotNET;
-using SignalRCommunicator.Proto;
 using SignalRCommunicator;
 using System.Collections.Concurrent;
+using SignalRCommunicator.Proto;
 
 namespace Project.Core.Protector
 {
@@ -41,7 +41,7 @@ namespace Project.Core.Protector
 		private const string Net_Fetcher = "Fetcher";
 
 		private readonly List<IpConfig> ipDict = new List<IpConfig>() {
-			new IpConfig("localhost",true,"2334","gw",$"{Net_Outer}")  ,
+			new IpConfig("192.168.8.196",true,"2334","csw",$"{Net_Fetcher}##{Net_Inner}")  ,
 			new IpConfig("serfend.top",true,"443","gw",$"{Net_Outer}")  ,
 			new IpConfig("192.168.8.8",true,"443","bgw",$"{Net_Fetcher}##{Net_Inner}") ,
 			 new IpConfig("21.176.51.59",true,"443","jz",$"{Net_Fetcher}##{Net_Inner}") ,
@@ -63,7 +63,7 @@ namespace Project.Core.Protector
 		public static Logger detectorLogger = LogManager.GetCurrentClassLogger().WithProperty("filename", LogServices.LogFile_Detector);
 		public Main()
 		{
-			LogServices.Init(); 
+			LogServices.Init();
 			detectorLogger.Log<string>(LogLevel.Info, "start");
 			networkChangeDetector = new PingDetector(null, ipDict.Select(ip => ip.Ip).ToArray());
 			var fetcherIp = ipDict.Where(ip => ip.Description != null && ip.Description.Contains(Net_Fetcher)).Select(ip => $"{ip.Ip}:{ip.Port}").ToList();
@@ -123,7 +123,13 @@ namespace Project.Core.Protector
 		{
 			pingSuccessRecord.Dispose();
 		}
-		private ConcurrentDictionary<string, SignalrCommunicator> signalrConncetions = new ConcurrentDictionary<string, SignalrCommunicator>();
+		private struct SignalRConnection
+		{
+			public SignalrCommunicator Connection;
+			public Report<ClientDeviceInfoDTO>? LastData;
+			public DateTime? LastUpdate;
+		}
+		private ConcurrentDictionary<string, SignalRConnection> signalrConncetions = new();
 		private void NetworkChangeDetector_OnPingReply(object? sender, PingSuccessEventArgs e)
 		{
 			var s = e.Reply;
@@ -157,6 +163,24 @@ namespace Project.Core.Protector
 			var host = ipDict.FirstOrDefault(ip => ip.Ip == r.TargetHost);
 			if (host == null) return;
 
+			var connectionTarget = $"{host.Ip}:{host.Port}";
+			if (!signalrConncetions.ContainsKey(connectionTarget)) signalrConncetions[connectionTarget] = new SignalRConnection()
+			{
+				Connection = new SignalrCommunicator(connectionTarget),
+			};
+			var (c, data) = CheckIfShouldSend(ipToNetwork, connectionTarget);
+
+			var tryTime = 1;
+			while (!c.Connection.ReportClientInfo(data).Result && tryTime-- > 0)
+			{
+				Debug.Print($"发送失败:{tryTime}");
+				Thread.Sleep(1000);
+			}
+		}
+		private (SignalRConnection, Report<ClientDeviceInfoDTO>?) CheckIfShouldSend(List<NetworkInterfaceInfo> ipToNetwork, string connectionTarget)
+		{
+
+			#region init data
 			var msg = new ClientDeviceInfoDTO
 			{
 				Computer = new ClientComputerInfoDTO
@@ -169,19 +193,21 @@ namespace Project.Core.Protector
 				},
 				Network = new ClientNetworkInfoDTO() { Interfaces = ipToNetwork?.Select(i => i?.ToDto()) }
 			};
-			var connectionTarget = $"{host.Ip}:{host.Port}";
-			if (!signalrConncetions.ContainsKey(connectionTarget)) signalrConncetions[connectionTarget] = new SignalrCommunicator(connectionTarget);
-			var success = signalrConncetions[connectionTarget].ReportClientInfo(new Report<ClientDeviceInfoDTO>()
+			var data = new Report<ClientDeviceInfoDTO>()
 			{
-				UserName = $"#SafeChecker#{new Reporter().Uid}",
+				UserName = new Reporter().Uid,
 				Message = msg,
-				Device = "ClientDesktop",
+				Device = $"ClientDesktop {Environment.Version}",
 				Rank = ActionRank.Debug
-			}).Result;
-			if (!success)
-			{
-				// TODO should resend
-			}
+			};
+			#endregion
+			var c = signalrConncetions[connectionTarget];
+			if (c.LastUpdate < DateTime.Today && new Random().Next(1000) > 990) { } // 新的一天，择机同步消息
+			else if (c.LastData?.Message?.Equals(data.Message) ?? false) return (c, null);
+			c.LastUpdate = DateTime.Today;
+			c.LastData = data;
+			signalrConncetions[connectionTarget] = c;
+			return (c, data);
 		}
 	}
 }
