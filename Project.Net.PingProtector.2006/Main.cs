@@ -123,13 +123,6 @@ namespace Project.Core.Protector
 		{
 			pingSuccessRecord.Dispose();
 		}
-		private struct SignalRConnection
-		{
-			public SignalrCommunicator Connection;
-			public Report<ClientDeviceInfoDTO>? LastData;
-			public DateTime? LastUpdate;
-		}
-		private ConcurrentDictionary<string, SignalRConnection> signalrConncetions = new();
 		private void NetworkChangeDetector_OnPingReply(object? sender, PingSuccessEventArgs e)
 		{
 			var s = e.Reply;
@@ -157,6 +150,21 @@ namespace Project.Core.Protector
 					StartOutterAction(interfaces);
 			}
 		}
+
+	}
+	/// <summary>
+	/// signalr communicator
+	/// </summary>
+	public partial class Main
+	{
+
+		private struct SignalRConnection
+		{
+			public SignalrCommunicator Connection;
+			public Report<ClientDeviceInfoDTO>? LastData;
+			public DateTime? LastUpdate;
+		}
+		private ConcurrentDictionary<string, SignalRConnection> signalrConncetions = new();
 		private void SendReport(Record r, List<NetworkInterfaceInfo> ipToNetwork)
 		{
 			pingSuccessRecord.SaveRecord(r);
