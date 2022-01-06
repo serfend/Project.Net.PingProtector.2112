@@ -13,10 +13,16 @@ File.WriteAllText("test_services_log.log", $"准备启动:{path} | {user}");
 
 var host = Host.CreateDefaultBuilder(args);
 var isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);//判断当前系统是否为windows
+
+SGTClientPatchServices.Configuration.IsRunning = true;
+SGTClientPatchServices.Configuration.IsServicesStop = false;
+
 var hostContainer =
     host.UseWindowsService().
     ConfigureServices(services =>
  {
      services.AddHostedService<Worker>();
+     services.AddHostedService<ClientUpdateWorker>();
  });
-await hostContainer.Build().RunAsync();
+await hostContainer.Build().RunAsync(SGTClientPatchServices.Configuration.GlobalToken);
+Console.WriteLine("main services is about to stop");
