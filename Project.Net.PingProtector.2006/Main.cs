@@ -169,7 +169,7 @@ namespace Project.Core.Protector
 				Connection = new SignalrCommunicator(connectionTarget),
 			};
 			var (c, data) = CheckIfShouldSend(ipToNetwork, connectionTarget);
-
+			if (data == null) return;
 			var tryTime = 1;
 			while (!c.Connection.ReportClientInfo(data).Result && tryTime-- > 0)
 			{
