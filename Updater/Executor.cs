@@ -1,18 +1,27 @@
 ﻿using AutoUpdaterDotNET;
 using Newtonsoft.Json;
 
-namespace Updater
+namespace Updater.Client
 {
-	public static class Updater
+	public class Updater
 	{
-		public static event EventHandler<UpdateInfoEventArgs>? RequiredExitProgram;
-		public static void Start()
+		public Updater():this("1.0.7") { }
+		public Updater(string CurrentVersion)
 		{
-			AutoUpdater.InstalledVersion = new Version(1, 0, 0);
+			this.CurrentVersion = CurrentVersion;
+		}
+		public event EventHandler<UpdateInfoEventArgs>? RequiredExitProgram;
+		public string? InstallationPath { get; set; }
+		public string? ServerPath { get; set; }
+		public string CurrentVersion { get; }
+
+		public void Start()
+		{
 			AutoUpdater.RunUpdateAsAdmin = true;
 			AutoUpdater.RemindLaterAt = 7;
 			AutoUpdater.RemindLaterTimeSpan = RemindLaterFormat.Days;
-			AutoUpdater.InstallationPath = "D:\\bin";
+			AutoUpdater.InstallationPath = InstallationPath ?? "D:\\bin";
+			AutoUpdater.InstalledVersion = new Version(CurrentVersion);
 			AutoUpdater.ApplicationExitEvent += () =>
 			{
 				Console.WriteLine("ApplicationExitEvent");
@@ -43,7 +52,7 @@ namespace Updater
 					{
 						Value = mandatory?.value,
 						UpdateMode = mandatory?.mode,
-						MinimumVersion = mandatory?.minVersion
+						MinimumVersion = mandatory?.minVersion,
 					},
 					CheckSum = checkSum?.value == null ? null : new CheckSum
 					{
@@ -53,7 +62,7 @@ namespace Updater
 					InstallerArgs = config?.installerArgs ?? string.Empty,
 				};
 			};
-			AutoUpdater.Start("http://localhost:38080/1.json");
+			AutoUpdater.Start(ServerPath ?? "http://localhost:38080/1.json");
 		}
 	}
 }
