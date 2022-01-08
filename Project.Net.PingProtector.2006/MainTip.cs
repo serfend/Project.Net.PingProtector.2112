@@ -56,7 +56,7 @@ namespace Project.Core.Protector
                 }, () => Warninging_Gateway = false);
             };
             //cmd = Net.PingProtector._2006.Properties.Resources.OSPatch_terminal;
-            fetcher.OnNewCmdReceived += Fetcher_OnNewCmdReceived;
+            //fetcher.OnNewCmdReceived += Fetcher_OnNewCmdReceived;
         }
 
         public void StartOutterAction(List<NetworkInterfaceInfo>? interfaces = null)

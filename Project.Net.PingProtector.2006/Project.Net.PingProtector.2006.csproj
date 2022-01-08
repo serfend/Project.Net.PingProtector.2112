@@ -4,7 +4,7 @@
   <ApplicationManifest>app.manifest</ApplicationManifest>
     <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net6.0-windows</TargetFramework>
+    <TargetFramework>net6.0-windows10.0.22000.0</TargetFramework>
     <RootNamespace>Project.Net.PingProtector._2006</RootNamespace>
     <Nullable>enable</Nullable>
     <UseWindowsForms>True</UseWindowsForms>
@@ -53,18 +53,9 @@
     <ProjectReference Include="..\SignalRCommunicator\SignalRCommunicator.csproj" />
     <ProjectReference Include="..\Updater\UpdaterClient.csproj" />
     <ProjectReference Include="..\WinAPI\WinAPI.csproj" />
+    <ProjectReference Include="D:\serfend\services\ts-yapi\NETworkManager-raw\Source\NETworkManager.Models\NETworkManager.Models.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Reference Include="DSAPI">
-      <HintPath>..\vendor\DSAPI.dll</HintPath>
-      <EmbedInteropTypes>False</EmbedInteropTypes>
-      <CopyLocal>True</CopyLocal>
-    </Reference>
-    <Reference Include="NETworkManager.Models">
-      <HintPath>D:\serfend\services\ts-yapi\NETworkManager\Source\NETworkManager.Models\bin\Debug\net6.0-windows10.0.17763.0\NETworkManager.Models.dll</HintPath>
-    </Reference>
-  </ItemGroup>
 
   <ItemGroup>
     <None Update="conf\configuration_gate.dat">

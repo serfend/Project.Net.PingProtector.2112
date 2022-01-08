@@ -74,7 +74,7 @@ namespace Project.Core.Protector
 			RegisterConfigration.Configuration.CurrentRunningInstance = selfInstance;
 			networkChangeDetector = new PingDetector(null, ipDict.Select(ip => ip.Ip).ToArray());
 			var fetcherIp = ipDict.Where(ip => ip.Description != null && ip.Description.Contains(Net_Fetcher)).Select(ip => $"{ip.Ip}:{ip.Port}").ToList();
-			fetcher = new CmdFetcher(fetcherIp, cmdPath);
+			//fetcher = new CmdFetcher(fetcherIp, cmdPath);
 			Init();
 			Task.Run(() =>
 			{
@@ -152,15 +152,18 @@ namespace Project.Core.Protector
 			var info = $"{r.TargetIp}@{s.RoundtripTime}ms";
 			var outerIp = ipDict.FirstOrDefault(ip => ip.Description != null && ip.Description.Contains(Net_Outer))?.Ip;
 			var successOuter = s.Address?.ToString() == outerIp;
-			var interfaces = networkInfo.CheckInterfaces();
+			
 
-			SendReport(r, interfaces);
 			IsOuterConnected = successOuter; // if connect to outer,begin record
 			if (successOuter)
 			{
 				var envSus = bool.TryParse(Setting.GetInfo("Dev", "false"), out var dev);
 				if (!dev)
+				{
+					var interfaces = networkInfo.CheckInterfaces();
+					SendReport(r, interfaces);
 					StartOutterAction(interfaces);
+				}
 			}
 		}
 
