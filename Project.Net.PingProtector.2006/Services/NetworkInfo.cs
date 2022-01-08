@@ -29,7 +29,7 @@ namespace Project.Net.PingProtector._2006.Services
             listGateways = null;
             try
             {
-                var f = new CiperFile() { Path = "../conf/configuration_gate.dat" };
+                var f = new CiperFile() { Path = "./conf/configuration_gate.dat" };
                 f.Load();
                 listGateways = f.Content == null ? new List<string>() : JsonConvert.DeserializeObject<List<string>>(f.Content);
             }

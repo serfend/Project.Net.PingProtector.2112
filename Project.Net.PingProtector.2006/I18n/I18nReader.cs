@@ -9,7 +9,7 @@ namespace Project.Net.PingProtector._2006.I18n
 {
     public class I18nReader : IConfigContent
     {
-        public CiperFile File { get; set; } = new CiperFile() { Path = "../conf/i18n.dat" };
+        public CiperFile File { get; set; } = new CiperFile() { Path = "./conf/i18n.dat" };
         public string Load()
         {
             return File.Load() ?? "{}";
