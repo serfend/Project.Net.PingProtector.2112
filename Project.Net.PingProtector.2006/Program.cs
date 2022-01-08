@@ -18,17 +18,17 @@ namespace Project.Net.PingProtector._2006
 			ApplicationConfiguration.Initialize();
 			try
 			{
-				MessageBox.Show($"start up at:args[{args.Length}]");
-				if (args.Length > 0)
-				{
-					MessageBox.Show($"arg0[{args[0]}]");
-					var argIsUpdate = args[0].ToLower() == UPDATE_FLAG;
-					if (argIsUpdate)
-					{
-						MessageBox.Show("is update");
-						Application.Exit();
-					}
-				}
+				//MessageBox.Show($"start up at:args[{args.Length}]");
+				//if (args.Length > 0)
+				//{
+				//	MessageBox.Show($"arg0[{args[0]}]");
+				//	var argIsUpdate = args[0].ToLower() == UPDATE_FLAG;
+				//	if (argIsUpdate)
+				//	{
+				//		MessageBox.Show("is update");
+				//		Application.Exit();
+				//	}
+				//}
 				AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
 				Application.ThreadException += Application_ThreadException;
 

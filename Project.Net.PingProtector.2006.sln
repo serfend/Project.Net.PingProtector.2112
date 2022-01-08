@@ -37,6 +37,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DevServer", "DevServer\DevS
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Updater", "Updater", "{1A630402-9B0F-4303-9FE7-856F2ACD3919}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RegisterConfigration", "RegisterConfigration\RegisterConfigration.csproj", "{ED7F7C43-C55B-4F0E-93F6-BCF601EDA9A2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -99,6 +101,10 @@ Global
 		{0B2440EB-518B-4D36-8888-4F770BE9185E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0B2440EB-518B-4D36-8888-4F770BE9185E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0B2440EB-518B-4D36-8888-4F770BE9185E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ED7F7C43-C55B-4F0E-93F6-BCF601EDA9A2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ED7F7C43-C55B-4F0E-93F6-BCF601EDA9A2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ED7F7C43-C55B-4F0E-93F6-BCF601EDA9A2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ED7F7C43-C55B-4F0E-93F6-BCF601EDA9A2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -113,6 +119,7 @@ Global
 		{09DC9B0C-42FF-461B-AE6A-0B28884C9DCD} = {1A630402-9B0F-4303-9FE7-856F2ACD3919}
 		{0B2440EB-518B-4D36-8888-4F770BE9185E} = {B80F91BF-DD05-4A12-8EDB-E2BB52667E04}
 		{1A630402-9B0F-4303-9FE7-856F2ACD3919} = {B80F91BF-DD05-4A12-8EDB-E2BB52667E04}
+		{ED7F7C43-C55B-4F0E-93F6-BCF601EDA9A2} = {B80F91BF-DD05-4A12-8EDB-E2BB52667E04}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {F5410085-16A8-435F-8CAB-3FCF7CE64A63}

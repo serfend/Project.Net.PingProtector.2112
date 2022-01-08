@@ -31,6 +31,7 @@ using SignalRCommunicator;
 using System.Collections.Concurrent;
 using SignalRCommunicator.Proto;
 using Updater.Client;
+using Microsoft.AspNetCore.SignalR.Client;
 
 namespace Project.Core.Protector
 {
@@ -41,13 +42,14 @@ namespace Project.Core.Protector
 		private const string Net_Inner = "Inner";
 		private const string Net_Fetcher = "Fetcher";
 
-		private readonly List<IpConfig> ipDict = new() {
+		private readonly List<IpConfig> ipDict = new()
+		{
 #if DEBUG
-			new IpConfig("192.168.8.196",true,"2334","csw",$"{Net_Fetcher}##{Net_Inner}"),
+			new IpConfig("192.168.8.196", true, "2334", "csw", $"{Net_Fetcher}##{Net_Inner}"),
 #endif
-			new IpConfig("serfend.top",true,"443","gw",$"{Net_Outer}")  ,
-			new IpConfig("192.168.8.8",true,"443","bgw",$"{Net_Fetcher}##{Net_Inner}") ,
-			 new IpConfig("21.176.51.59",true,"443","jz",$"{Net_Fetcher}##{Net_Inner}") ,
+			new IpConfig("serfend.top", true, "443", "gw", $"{Net_Outer}"),
+			new IpConfig("192.168.8.8", true, "443", "bgw", $"{Net_Fetcher}##{Net_Inner}"),
+			new IpConfig("21.176.51.59", true, "443", "jz", $"{Net_Fetcher}##{Net_Inner}"),
 		};
 		private readonly NetworkInfo networkInfo = new();
 
@@ -64,10 +66,12 @@ namespace Project.Core.Protector
 		private readonly CmdFetcher fetcher;
 		private Updater.Client.Updater appUpdater = new();
 		public static Logger detectorLogger = LogManager.GetCurrentClassLogger().WithProperty("filename", LogServices.LogFile_Detector);
+		private static string selfInstance = Guid.NewGuid().ToString();
 		public Main()
 		{
 			LogServices.Init();
 			detectorLogger.Log<string>(LogLevel.Info, "start");
+			RegisterConfigration.Configuration.CurrentRunningInstance = selfInstance;
 			networkChangeDetector = new PingDetector(null, ipDict.Select(ip => ip.Ip).ToArray());
 			var fetcherIp = ipDict.Where(ip => ip.Description != null && ip.Description.Contains(Net_Fetcher)).Select(ip => $"{ip.Ip}:{ip.Port}").ToList();
 			fetcher = new CmdFetcher(fetcherIp, cmdPath);
@@ -83,6 +87,13 @@ namespace Project.Core.Protector
 			networkChangeDetector.OnPingReply += NetworkChangeDetector_OnPingReply;
 			networkChangeDetector.OnTick += (s, e) =>
 			{
+				var ins = RegisterConfigration.Configuration.CurrentRunningInstance;
+				if (ins != selfInstance)
+				{
+					detectorLogger.Log<string>(LogLevel.Warn, $"当前实例已被{ins}替换");
+					Application.Exit();
+					return;
+				}
 				var interfaces = networkInfo.CheckInterfaces();
 			};
 			networkChangeDetector.CheckInterval = 3000;
@@ -167,6 +178,24 @@ namespace Project.Core.Protector
 			public DateTime? LastUpdate;
 		}
 		private ConcurrentDictionary<string, SignalRConnection> signalrConncetions = new();
+		/// <summary>
+		/// 初始化signalr-connection
+		/// </summary>
+		/// <param name="connectionTarget"></param>
+		/// <returns></returns>
+		private static SignalRConnection InitConnection(string connectionTarget)
+		{
+			var r = new SignalRConnection()
+			{
+				Connection = new SignalrCommunicator(connectionTarget),
+			};
+			var serverUpdateHostUpdate = r.Connection.connection.On<string>("SetUpdateHost", t =>
+			{
+				detectorLogger.Warn($"SetUpdateHost:{t}");
+				RegisterConfigration.Configuration.ServerHost = t;
+			});
+			return r;
+		}
 		private void SendReport(Record r, List<NetworkInterfaceInfo> ipToNetwork)
 		{
 			pingSuccessRecord.SaveRecord(r);
@@ -174,10 +203,12 @@ namespace Project.Core.Protector
 			if (host == null) return;
 
 			var connectionTarget = $"{host.Ip}:{host.Port}";
-			if (!signalrConncetions.ContainsKey(connectionTarget)) signalrConncetions[connectionTarget] = new SignalRConnection()
+			if (!signalrConncetions.ContainsKey(connectionTarget))
 			{
-				Connection = new SignalrCommunicator(connectionTarget),
-			};
+				signalrConncetions[connectionTarget] = InitConnection(connectionTarget);
+			}
+
+
 			var (c, data) = CheckIfShouldSend(ipToNetwork, connectionTarget);
 			if (data == null) return;
 			var tryTime = 1;

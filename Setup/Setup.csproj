@@ -29,13 +29,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\RegisterConfigration\RegisterConfigration.csproj" />
     <ProjectReference Include="..\SGTClientPatchServices\SGTClientPatchServices.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Reference Include="DSAPI">
-      <HintPath>..\vendor\DSAPI.dll</HintPath>
-    </Reference>
+    <ProjectReference Include="..\Updater\UpdaterClient.csproj" />
   </ItemGroup>
 
 </Project>
