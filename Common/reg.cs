@@ -170,7 +170,28 @@ namespace DotNet4.Utilities
 				}
 				return new Reg($"{_subkey}\\{childNodeName}", _domain);
 			}
-
+			/// <summary>
+			/// 回到其父节点
+			/// </summary>
+			/// <returns></returns>
+			public virtual Reg Out()
+			{
+				var current = _subkey.Split('\\').ToList();
+				if (current.Count >= 1) current.RemoveAt(current.Count - 1);
+				var newPath = string.Join("\\", current);
+				return new Reg(newPath,_domain);
+			}
+			/// <summary>
+			/// 删除此节点本身
+			/// </summary>
+			/// <returns></returns>
+			public virtual bool Delete()
+			{
+				var current = _subkey.Split('\\').ToList();
+				var lastNode = current.LastOrDefault() ?? string.Empty;
+				var n = Out();
+				return n.Delete(lastNode);
+			}
 			/// <summary>
 			/// 删除此节点下面的某个节点。
 			/// </summary>
@@ -181,9 +202,13 @@ namespace DotNet4.Utilities
 				var success = false;
 				if (subKey == string.Empty || subKey == null) return false;
 				RegistryKey key = InnerKey;
+
 				try
 				{
-					key.DeleteSubKey(subKey);
+					if (InnerKey.SubKeyCount > 0 || InnerKey.ValueCount > 0)
+						key.DeleteSubKeyTree(subKey);
+					else
+						key.DeleteSubKey(subKey);
 					success = true;
 				}
 				catch
@@ -222,7 +247,7 @@ namespace DotNet4.Utilities
 
 			public virtual string GetInfo(string name) => GetInfo(name, null);
 
-			public virtual string GetInfo(string name, string? defaultInfo)
+			public virtual string? GetInfo(string name, string? defaultInfo)
 			{
 				if (name == string.Empty || name == null) { return ""; }
 				RegistryKey key = InnerKey;
