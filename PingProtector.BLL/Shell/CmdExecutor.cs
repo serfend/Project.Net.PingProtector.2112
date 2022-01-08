@@ -40,10 +40,10 @@ namespace PingProtector.BLL.Shell
         public Task<Tuple<string, string>> CmdRunAsync(string title, string str, string process = Process_Cmd, bool requireAdmin = false) => Task.FromResult(CmdRun(title, str, process, requireAdmin));
         public event EventHandler<MessageEventArgs>? OnMessage;
 
-        public bool EnableRedirectStandardInput { get; set; } = false;
-        public bool EnableRedirectStandardOutput { get; set; } = false;
-        public bool EnableRedirectStandardError { get; set; } = false;
-        public bool UseShellExecute { get; set; } = false;
+        public bool EnableRedirectStandardInput { get; set; } = true;
+        public bool EnableRedirectStandardOutput { get; set; } = true;
+        public bool EnableRedirectStandardError { get; set; } = true;
+        public bool UseShellExecute { get; set; } = true;
         public Tuple<string, string> CmdRun(string title, string str, string? process = null, bool requireAdmin = false)
         {
             var p = new Process();
