@@ -19,7 +19,7 @@ namespace Common.Extensions
 		}
 		public static string ToSummary(this Exception? ex, bool nestView = true)
 		{
-			if (ex == null) return "无效的异常信息";
+			if (ex == null) return "无异常";
 			var content = $"{ex.Message}\n{ex.StackTrace}";
 			if (!nestView)
 				return content;
