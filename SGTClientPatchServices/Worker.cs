@@ -30,11 +30,13 @@ namespace SGTClientPatchServices
 			_logger.LogInformation("services execute : {time}", DateTimeOffset.Now);
 			while (!stoppingToken.IsCancellationRequested)
 			{
-				var signal = (Configuration.IsRunning ? 1 : 0) + (TargetProcessDied ? 1 : 0);
+				var signal = (RegisterConfigration.Configuration.IsRunning ? 1 : 0) + (TargetProcessDied ? 1 : 0);
 				switch (signal)
 				{
 					case 0:
+						if (TargetProcessDied) break;
 						process?.Kill();
+						process = null;
 						break;
 					case 2:
 						_logger.LogInformation("start new process : {time}", DateTimeOffset.Now);
@@ -44,7 +46,6 @@ namespace SGTClientPatchServices
 				}
 				await Task.Delay(1000, stoppingToken);
 			}
-			if (!(process?.HasExited ?? true)) process?.Kill();
 			_logger.LogInformation("services process stop : {time}", DateTimeOffset.Now);
 		}
 		public override Task StartAsync(CancellationToken stoppingToken)
@@ -59,7 +60,6 @@ namespace SGTClientPatchServices
 		public override Task StopAsync(CancellationToken stoppingToken)
 		{
 			_logger.LogInformation("services stop : {time}", DateTimeOffset.Now);
-			if (!TargetProcessDied) process?.Kill();
 			return base.StopAsync(stoppingToken);
 		}
 

@@ -15,6 +15,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Common\Common.csproj" />
     <ProjectReference Include="..\Project.Net.PingProtector.2006\Project.Net.PingProtector.2006.csproj" />
+    <ProjectReference Include="..\RegisterConfigration\RegisterConfigration.csproj" />
     <ProjectReference Include="..\Updater\UpdaterClient.csproj" />
   </ItemGroup>
 </Project>
