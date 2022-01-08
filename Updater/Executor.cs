@@ -1,22 +1,36 @@
 ﻿using AutoUpdaterDotNET;
 using Newtonsoft.Json;
+using UpdaterClient.Events;
 
 namespace Updater.Client
 {
 	public class Updater
 	{
-		public Updater():this("1.0.7") { }
+		public Updater() : this("1.1.10") { }
 		public Updater(string CurrentVersion)
 		{
 			this.CurrentVersion = CurrentVersion;
 		}
 		public event EventHandler<UpdateInfoEventArgs>? RequiredExitProgram;
 		public string? InstallationPath { get; set; }
-		public string? ServerPath { get; set; }
-		public string CurrentVersion { get; }
+		public string? ServerPath => RegisterConfigration.Configuration.ServerHost;
 
+		public string CurrentVersion { get; }
+		public void StartDownload(UpdateInfoEventArgs e)
+		{
+			if (AutoUpdater.DownloadUpdate(e))
+			{
+				RequiredExitProgram?.Invoke(null, e);
+			};
+		}
 		public void Start()
 		{
+			if (ServerPath == null)
+			{
+				OnUpdateServerNotSet?.Invoke(this, new UpdateServerNotSetEventArgs());
+				return; // 未指定服务器，停止本次更新
+			}
+
 			AutoUpdater.RunUpdateAsAdmin = true;
 			AutoUpdater.RemindLaterAt = 7;
 			AutoUpdater.RemindLaterTimeSpan = RemindLaterFormat.Days;
@@ -31,10 +45,6 @@ namespace Updater.Client
 				Console.WriteLine("CheckForUpdateEvent");
 				if (e.Error != null) return;
 				if (!e.IsUpdateAvailable) return;
-				if (AutoUpdater.DownloadUpdate(e))
-				{
-					RequiredExitProgram?.Invoke(null, e);
-				};
 			};
 			AutoUpdater.ParseUpdateInfoEvent += (e) =>
 			{
@@ -62,7 +72,9 @@ namespace Updater.Client
 					InstallerArgs = config?.installerArgs ?? string.Empty,
 				};
 			};
-			AutoUpdater.Start(ServerPath ?? "http://localhost:38080/1.json");
+			
+			AutoUpdater.Start(ServerPath);
 		}
+		public event EventHandler<UpdateServerNotSetEventArgs>? OnUpdateServerNotSet;
 	}
 }
