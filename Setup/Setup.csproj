@@ -13,6 +13,7 @@
 
   <ItemGroup>
     <None Remove="app.manifest" />
+    <None Remove="logo-withbrand.ico" />
   </ItemGroup>
 
   <ItemGroup>
@@ -24,15 +25,19 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Serilog" Version="2.10.0" />
-    <PackageReference Include="Serilog.Sinks.Console" Version="4.0.1" />
-    <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="6.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.0" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\ClientProxyTray\ClientProxyTray.csproj" />
     <ProjectReference Include="..\RegisterConfigration\RegisterConfigration.csproj" />
     <ProjectReference Include="..\SGTClientPatchServices\SGTClientPatchServices.csproj" />
     <ProjectReference Include="..\Updater\UpdaterClient.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="logo-withbrand.ico" />
   </ItemGroup>
 
 </Project>
