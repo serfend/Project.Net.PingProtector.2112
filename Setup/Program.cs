@@ -81,10 +81,11 @@ namespace Setup
 			if (vNew <= vOld)
 			{
 				Log.Warning($"当前已安装的版本是更加新的版本({vOld})，取消安装({vNew})");
+				Console.ReadLine();
 				return;
 			}
-			RegisterConfigration.Configuration.CurrentVersion = vNew.ToString();
 			Install(args);
+			RegisterConfigration.Configuration.CurrentVersion = vNew.ToString();
 		}
 		private static void Waiting()
 		{
