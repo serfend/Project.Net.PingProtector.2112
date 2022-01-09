@@ -58,6 +58,9 @@
 
 
   <ItemGroup>
+    <None Update="conf\config.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="conf\configuration_gate.dat">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
