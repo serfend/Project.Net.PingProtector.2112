@@ -62,7 +62,7 @@ namespace WinAPI
 
             /// </summary> 
 
-            public Int32 fAnyOperationsAborted;
+            public int fAnyOperationsAborted;
 
             public IntPtr hNameMappings;
 
@@ -119,10 +119,6 @@ namespace WinAPI
             }
             CloseHandle(vHandle);
             return FileStatus.None;
-        }
-        public static void Detache(this FileInfo file)
-        {
-
         }
         [Flags]
         public enum FileStatus
