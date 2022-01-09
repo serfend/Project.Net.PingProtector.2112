@@ -39,6 +39,11 @@ namespace RegisterConfigration
 			get => int.Parse(processConfig.GetInfo("UpdateAvailable", "0") ?? "0") > 0;
 			set => processConfig.SetInfo("UpdateAvailable", value ? 1 : 0, RegValueKind.DWord);
 		}
+		public static long CurrentRunningInstanceActive
+		{
+			get => long.Parse(processConfig.GetInfo("CurrentRunningInstanceActive", "0") ?? "0");
+			set => processConfig.SetInfo("CurrentRunningInstanceActive", value, RegValueKind.QWord);
+		}
 		/// <summary>
 		/// 可通联的服务器地址
 		/// </summary>
@@ -63,6 +68,7 @@ namespace RegisterConfigration
 			get => processConfig.GetInfo("CurrentRunningInstance");
 			set => processConfig.SetInfo("CurrentRunningInstance", value);
 		}
+
 		public static CancellationToken GlobalToken => globalToken.Token;
 	}
 	public static partial class Configuration

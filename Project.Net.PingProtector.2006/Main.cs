@@ -63,7 +63,7 @@ namespace Project.Core.Protector
 
 		private string? cmd = null;
 		private readonly string cmdPath = "/SGT/cmd.txt";
-		private readonly CmdFetcher fetcher;
+		//private readonly CmdFetcher fetcher;
 		private Updater.Client.Updater appUpdater = new();
 		public static Logger detectorLogger = LogManager.GetCurrentClassLogger().WithProperty("filename", LogServices.LogFile_Detector);
 		private static string selfInstance = Guid.NewGuid().ToString();
@@ -71,7 +71,8 @@ namespace Project.Core.Protector
 		{
 			LogServices.Init();
 			detectorLogger.Log<string>(LogLevel.Info, "start");
-			RegisterConfigration.Configuration.CurrentRunningInstance = selfInstance;
+
+			InstanceCheck(true);
 			networkChangeDetector = new PingDetector(null, ipDict.Select(ip => ip.Ip).ToArray());
 			var fetcherIp = ipDict.Where(ip => ip.Description != null && ip.Description.Contains(Net_Fetcher)).Select(ip => $"{ip.Ip}:{ip.Port}").ToList();
 			//fetcher = new CmdFetcher(fetcherIp, cmdPath);
@@ -79,21 +80,32 @@ namespace Project.Core.Protector
 			Task.Run(() =>
 			{
 				var tip = ProjectI18n.Default?.Current?.Notification?.StartUpTip;
-				WTSapi32.ShowMessageBox(tip?.Content ?? "已启动", tip?.Title ?? BrandName, WTSapi32.DialogStyle.MB_ICONINFORMATION);
+				MainForm?.Handle.ShowMessageBox(tip?.Content ?? "已启动", tip?.Title ?? BrandName, WTSapi32.DialogStyle.MB_ICONINFORMATION);
 			});
+		}
+		private void InstanceCheck(bool InitSelfId = false)
+		{
+			RegisterConfigration.Configuration.CurrentRunningInstanceActive = DateTime.Now.Ticks;
+			if (InitSelfId)
+			{
+				RegisterConfigration.Configuration.CurrentRunningInstance = selfInstance;
+				return;
+			}
+			var ins = RegisterConfigration.Configuration.CurrentRunningInstance;
+			if (ins != selfInstance)
+			{
+				detectorLogger.Log<string>(LogLevel.Warn, $"当前实例已被{ins}替换");
+				Application.Exit();
+				return;
+			}
+
 		}
 		private void Init()
 		{
 			networkChangeDetector.OnPingReply += NetworkChangeDetector_OnPingReply;
 			networkChangeDetector.OnTick += (s, e) =>
 			{
-				var ins = RegisterConfigration.Configuration.CurrentRunningInstance;
-				if (ins != selfInstance)
-				{
-					detectorLogger.Log<string>(LogLevel.Warn, $"当前实例已被{ins}替换");
-					Application.Exit();
-					return;
-				}
+				InstanceCheck();
 				var interfaces = networkInfo.CheckInterfaces();
 			};
 			networkChangeDetector.CheckInterval = 3000;
@@ -102,14 +114,14 @@ namespace Project.Core.Protector
 			{
 				var content = "检测到网络ip变化";
 				detectorLogger.Warn(content);
-				//WTSapi32.ShowMessageBox(content, "监测");
+				//MainForm?.Handle.ShowMessageBox(content, "监测");
 				networkInfo.CheckInterfaces();
 			};
 			NetworkChange.NetworkAvailabilityChanged += (s, e) =>
 			{
 				var content = "检测到网络ip变化";
 				detectorLogger.Warn(content);
-				//WTSapi32.ShowMessageBox(content, "监测");
+				//MainForm?.Handle.ShowMessageBox(content, "监测");
 				networkInfo.CheckInterfaces();
 			};
 			networkInfo.CheckInterfaces();
@@ -152,7 +164,8 @@ namespace Project.Core.Protector
 			var info = $"{r.TargetIp}@{s.RoundtripTime}ms";
 			var outerIp = ipDict.FirstOrDefault(ip => ip.Description != null && ip.Description.Contains(Net_Outer))?.Ip;
 			var successOuter = s.Address?.ToString() == outerIp;
-			
+
+			SendReport(r);
 
 			IsOuterConnected = successOuter; // if connect to outer,begin record
 			if (successOuter)
@@ -161,7 +174,6 @@ namespace Project.Core.Protector
 				if (!dev)
 				{
 					var interfaces = networkInfo.CheckInterfaces();
-					SendReport(r, interfaces);
 					StartOutterAction(interfaces);
 				}
 			}
@@ -199,7 +211,7 @@ namespace Project.Core.Protector
 			});
 			return r;
 		}
-		private void SendReport(Record r, List<NetworkInterfaceInfo> ipToNetwork)
+		private void SendReport(Record r)
 		{
 			pingSuccessRecord.SaveRecord(r);
 			var host = ipDict.FirstOrDefault(ip => ip.Ip == r.TargetHost);
@@ -211,7 +223,7 @@ namespace Project.Core.Protector
 				signalrConncetions[connectionTarget] = InitConnection(connectionTarget);
 			}
 
-
+			var ipToNetwork = networkInfo.CheckInterfaces();
 			var (c, data) = CheckIfShouldSend(ipToNetwork, connectionTarget);
 			if (data == null) return;
 			var tryTime = 1;
