@@ -4,14 +4,6 @@ using IpSwitch.Helper;
 using NETworkManager.Models.Network;
 using Newtonsoft.Json;
 using NLog;
-using PingProtector.BLL.Network;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Management;
-using System.Text;
-using System.Threading.Tasks;
-using static PingProtector.BLL.Shell.MessageEventArgs;
 
 namespace Project.Net.PingProtector._2006.Services
 {
@@ -37,12 +29,24 @@ namespace Project.Net.PingProtector._2006.Services
             {
             }
         }
+        private DateTime lastInterfacesUpdateTime = DateTime.MinValue;
+        private List<NetworkInterfaceInfo>? interfaces;
+        public List<NetworkInterfaceInfo> Interfaces { 
+            get {
+                var now = DateTime.Now;
+				if (now.Subtract(lastInterfacesUpdateTime).TotalSeconds > 3)
+				{
+                    lastInterfacesUpdateTime = now;
+                    interfaces = NetworkInterface.GetNetworkInterfaces();
+                }
+                return interfaces ?? new List<NetworkInterfaceInfo>();
+            } 
+        } 
         public List<NetworkInterfaceInfo> CheckInterfaces()
         {
-            var interfaces = NetworkInterface.GetNetworkInterfaces();
             var network_interface = new NetworkInterface();
 #if !DEBUG
-            interfaces.ForEach(g =>
+            Interfaces.ForEach(g =>
             {
                 g.CheckDhcpConfigure();
                 g.CheckGatewayRange(listGateways);
@@ -52,7 +56,7 @@ namespace Project.Net.PingProtector._2006.Services
                 });
             });
 #endif
-            return interfaces;
+            return Interfaces;
         }
     }
 }
