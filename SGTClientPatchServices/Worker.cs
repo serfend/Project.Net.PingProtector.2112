@@ -1,6 +1,7 @@
 using DotNet4.Utilities.UtilReg;
 using System.Diagnostics;
 using System.Windows.Forms;
+using WinAPI;
 
 namespace SGTClientPatchServices
 {
@@ -12,19 +13,15 @@ namespace SGTClientPatchServices
 		{
 			_logger = logger;
 		}
-		private Process NewProcess()
+		private void NewProcess()
 		{
-			return new Process()
+			var path = Path.Join(AppDomain.CurrentDomain.BaseDirectory, $"{Project.Core.Protector.Main.PackageName}.exe");
+			var (result,status) = new FileInfo(path).CreateProcess();
+			if(result!= WTSapi32.CreateProcessResult.Success)
 			{
-				StartInfo = new ProcessStartInfo()
-				{
-					FileName = Path.Join(AppDomain.CurrentDomain.BaseDirectory, $"{Project.Core.Protector.Main.PackageName}.exe"),
-					UseShellExecute = true,
-				},
-
-			};
+				_logger.LogError($"进程启动失败:{result}:{status}");
+			}
 		}
-		private Process? process = null;
 		protected override async Task ExecuteAsync(CancellationToken stoppingToken)
 		{
 			_logger.LogInformation("services execute : {time}", DateTimeOffset.Now);
@@ -35,13 +32,10 @@ namespace SGTClientPatchServices
 				{
 					case 0:
 						if (TargetProcessDied) break;
-						process?.Kill();
-						process = null;
 						break;
 					case 2:
 						_logger.LogInformation("start new process : {time}", DateTimeOffset.Now);
-						process = NewProcess();
-						process.Start();
+						NewProcess();
 						break;
 				}
 				await Task.Delay(1000, stoppingToken);
@@ -56,7 +50,7 @@ namespace SGTClientPatchServices
 		/// <summary>
 		/// 是否应拉起被守护的进程
 		/// </summary>
-		private bool TargetProcessDied => process?.HasExited ?? true;
+		private bool TargetProcessDied => (DateTime.Now.Ticks - RegisterConfigration.Configuration.CurrentRunningInstanceActive) / 1e7 > 5;
 		public override Task StopAsync(CancellationToken stoppingToken)
 		{
 			_logger.LogInformation("services stop : {time}", DateTimeOffset.Now);

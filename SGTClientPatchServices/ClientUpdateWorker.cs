@@ -7,9 +7,14 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using WinAPI;
 
 namespace SGTClientPatchServices
 {
+	/// <summary>
+	/// 这种是不行的，windows服务没法唤醒程序替换
+	/// 应新增一个托盘程序用于前台操作
+	/// </summary>
 	public class ClientUpdateWorker : BackgroundService
 	{
 		private readonly ILogger<ClientUpdateWorker> _logger;
@@ -45,10 +50,12 @@ namespace SGTClientPatchServices
 				_logger.LogWarning($"check update:available{args.IsUpdateAvailable},exception:{args.Error.ToSummary()}");
 				return;
 			}
-			_logger.LogWarning("start setup program...");
 			RegisterConfigration.Configuration.UpdateAvailable = true;
+			Thread.Sleep(1000);
+			if (!RegisterConfigration.Configuration.UpdateAvailable) _logger.LogError("修改更新状态失败");
+			var result = new FileInfo("Setup.exe").CreateProcess();
+			_logger.LogWarning($"start setup program...{result.Item1}:{result.Item2}");
 			RegisterConfigration.Configuration.IsServicesStop = true;
-			Process.Start("Setup.exe");
 		}
 
 		public override Task StartAsync(CancellationToken stoppingToken)

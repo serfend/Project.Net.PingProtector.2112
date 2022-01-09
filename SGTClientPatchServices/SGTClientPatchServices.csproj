@@ -18,5 +18,6 @@
     <ProjectReference Include="..\Project.Net.PingProtector.2006\Project.Net.PingProtector.2006.csproj" />
     <ProjectReference Include="..\RegisterConfigration\RegisterConfigration.csproj" />
     <ProjectReference Include="..\Updater\UpdaterClient.csproj" />
+    <ProjectReference Include="..\WinAPI\WinAPI.csproj" />
   </ItemGroup>
 </Project>
