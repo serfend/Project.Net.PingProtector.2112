@@ -1,4 +1,6 @@
-﻿using DotNet4.Utilities.UtilReg;
+﻿using Common.PowershellHelper;
+using DotNet4.Utilities.UtilReg;
+using PingProtector.BLL.Shell;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,6 +29,7 @@ namespace Setup.Extensions
 		/// <param name="description"></param>
 		public static void InstallService(this ServiceRegister r, string exePath, string? brand = null, ServiceStartType startType = ServiceStartType.Auto, string? description = null)
 		{
+			new CmdExecutor().CmdRun("register_services", $"sc create {r.PackageName} binpath= \"{exePath}\"");
 			r.SetServicesConfig("Description", description ?? "");
 			r.SetServicesConfig("ImagePath", exePath);
 			r.SetServicesConfig("DisplayName", brand ?? r.PackageName);
