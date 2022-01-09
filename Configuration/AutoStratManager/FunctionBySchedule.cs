@@ -16,12 +16,18 @@ namespace Configuration.AutoStratManager
 		private const string description = "SGT Team Intelligent Security Project";
 		private const string name = "safeguard_services";
 		private Microsoft.Win32.TaskScheduler.Task? task;
+		public string Name { get; set; }
 
-		public FunctionBySchedule()
+		public FunctionBySchedule(string name)
+		{
+			Name = name;
+		}
+
+		public FunctionBySchedule() : this(name)
 		{
 			using (var taskService = new TaskService())
 			{
-				var tasks = taskService.RootFolder.GetTasks(new Regex(name));
+				var tasks = taskService.RootFolder.GetTasks(new Regex(Name));
 				foreach (var t in tasks)
 				{
 					if (t.Name == name)
