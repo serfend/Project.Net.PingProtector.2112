@@ -29,7 +29,7 @@ namespace Project.Core.Protector
             var content = item.Replace("{summary}", msg);
             detectorLogger.Log<string>(LogLevel.Warn, $"{content}:{e.Interface.ToDetail()}");
             if (beforeTipAndHideMessageBox?.Invoke() ?? false) return;
-            MainForm?.Handle.ShowMessageBox(content, BrandName, (WTSapi32.DialogStyle)(dialogStyle ?? ((int)WTSapi32.DialogStyle.MB_OK + (int)WTSapi32.DialogStyle.MB_ICONERROR)));
+            IntPtr.Zero.ShowMessageBox(content, BrandName, (WTSapi32.DialogStyle)(dialogStyle ?? ((int)WTSapi32.DialogStyle.MB_OK + (int)WTSapi32.DialogStyle.MB_ICONERROR)));
             afterTip?.Invoke();
         }
         private void TipInit()
@@ -66,7 +66,7 @@ namespace Project.Core.Protector
             {
                 var tip = ProjectI18n.Default?.Current?.Notification?.OuterNetworkDetected;
                 detectorLogger.Error($"发现连接到外网:{JsonSerializer.Serialize(interfaces.Select(i => i.ToDetail()))}");
-                MainForm?.Handle.ShowMessageBox(
+                IntPtr.Zero.ShowMessageBox(
                     tip?.Content ?? "连接到外网一旦被网络监管部门发现，后果将相当严重\n为保护您的安全，已切断网络连接，请尽快拔掉网线并重新连回内网。",
                     tip?.Title ?? "连接外网警告",
                     (WTSapi32.DialogStyle)(tip?.DialogStyle ?? (int)(WTSapi32.DialogStyle.MB_OK | WTSapi32.DialogStyle.MB_ICONERROR)));

@@ -23,19 +23,13 @@ namespace ClientProxyTray
 		public App()
 		{
 		}
-		private string pipeName = $".\\Private$\\{Process.GetCurrentProcess().ProcessName}";
+		private string pipeName = $"Inst_{Process.GetCurrentProcess().ProcessName}";
 		protected override void OnStartup(StartupEventArgs e)
 		{
-			var cts = System.Windows.Forms.WindowsFormsSynchronizationContext.Current;
-			new ProcessInstance(pipeName).CheckInstace(() =>
-			{
-				cts.Send(new SendOrPostCallback((d) =>
-				{
-					Application.Current.Shutdown();
-					return;
-				}), null);
-				return; // 连接成功，说明多开
-			});
+			if (new ProcessInstance(pipeName).CheckInstaceByMutex()) {
+				Environment.Exit(0);
+				return;
+			}
 			new FunctionByReg().EnableAsync().Wait();
 			base.OnStartup(e);
 		}

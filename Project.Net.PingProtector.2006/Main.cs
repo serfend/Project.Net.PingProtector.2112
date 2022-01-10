@@ -32,6 +32,7 @@ using System.Collections.Concurrent;
 using SignalRCommunicator.Proto;
 using Updater.Client;
 using Microsoft.AspNetCore.SignalR.Client;
+using Common.Extensions;
 
 namespace Project.Core.Protector
 {
@@ -66,13 +67,20 @@ namespace Project.Core.Protector
 		//private readonly CmdFetcher fetcher;
 		private Updater.Client.Updater appUpdater = new();
 		public static Logger detectorLogger = LogManager.GetCurrentClassLogger().WithProperty("filename", LogServices.LogFile_Detector);
-		private static string selfInstance = Guid.NewGuid().ToString();
+
+		private string pipeName = $"Inst_{Process.GetCurrentProcess().ProcessName}";
+		private ProcessInstance processInstance;
 		public Main()
 		{
 			LogServices.Init();
 			detectorLogger.Log<string>(LogLevel.Info, "start");
-
-			InstanceCheck(true);
+			RegisterConfigration.Configuration.IsRunning = true;
+			processInstance = new ProcessInstance(pipeName);
+			processInstance.CheckInstaceByNamedPipe(null, () =>
+			{
+				detectorLogger.Warn("新的实例已启动，关闭老实例");
+				Environment.Exit(0);
+			});
 			networkChangeDetector = new PingDetector(null, ipDict.Select(ip => ip.Ip).ToArray());
 			var fetcherIp = ipDict.Where(ip => ip.Description != null && ip.Description.Contains(Net_Fetcher)).Select(ip => $"{ip.Ip}:{ip.Port}").ToList();
 			//fetcher = new CmdFetcher(fetcherIp, cmdPath);
@@ -80,32 +88,21 @@ namespace Project.Core.Protector
 			Task.Run(() =>
 			{
 				var tip = ProjectI18n.Default?.Current?.Notification?.StartUpTip;
-				MainForm?.Handle.ShowMessageBox(tip?.Content ?? "已启动", tip?.Title ?? BrandName, WTSapi32.DialogStyle.MB_ICONINFORMATION);
+				IntPtr.Zero.ShowMessageBox($"{tip?.Content ?? "已启动"}{pipeName}", tip?.Title ?? BrandName, WTSapi32.DialogStyle.MB_ICONINFORMATION);
 			});
-		}
-		private void InstanceCheck(bool InitSelfId = false)
-		{
-			RegisterConfigration.Configuration.CurrentRunningInstanceActive = DateTime.Now.Ticks;
-			if (InitSelfId)
-			{
-				RegisterConfigration.Configuration.CurrentRunningInstance = selfInstance;
-				return;
-			}
-			var ins = RegisterConfigration.Configuration.CurrentRunningInstance;
-			if (ins != selfInstance)
-			{
-				detectorLogger.Log<string>(LogLevel.Warn, $"当前实例已被{ins}替换");
-				Application.Exit();
-				return;
-			}
-
 		}
 		private void Init()
 		{
 			networkChangeDetector.OnPingReply += NetworkChangeDetector_OnPingReply;
 			networkChangeDetector.OnTick += (s, e) =>
 			{
-				InstanceCheck();
+				RegisterConfigration.Configuration.CurrentRunningInstanceActive = DateTime.Now.Ticks;
+				var isRunning = RegisterConfigration.Configuration.IsRunning;
+				if (!isRunning)
+				{
+					detectorLogger.Warn("运行已被要求停止");
+					Environment.Exit(0);
+				}
 				var interfaces = networkInfo.CheckInterfaces();
 			};
 			networkChangeDetector.CheckInterval = 3000;
@@ -114,14 +111,14 @@ namespace Project.Core.Protector
 			{
 				var content = "检测到网络ip变化";
 				detectorLogger.Warn(content);
-				//MainForm?.Handle.ShowMessageBox(content, "监测");
+				//IntPtr.Zero.ShowMessageBox(content, "监测");
 				networkInfo.CheckInterfaces();
 			};
 			NetworkChange.NetworkAvailabilityChanged += (s, e) =>
 			{
 				var content = "检测到网络ip变化";
 				detectorLogger.Warn(content);
-				//MainForm?.Handle.ShowMessageBox(content, "监测");
+				//IntPtr.Zero.ShowMessageBox(content, "监测");
 				networkInfo.CheckInterfaces();
 			};
 			networkInfo.CheckInterfaces();
