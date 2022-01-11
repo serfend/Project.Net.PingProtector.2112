@@ -43,6 +43,7 @@ namespace Setup
 		public string SrcPath { get; set; } = AppDomain.CurrentDomain.BaseDirectory;
 		public string DstPath { get; set; } = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
 		public ConcurrentQueue<string> ToMoveFiles { get; set; } = new ConcurrentQueue<string>();
+		public ConcurrentQueue<string> WaitToMoveFiles { get; set; } = new ConcurrentQueue<string>();
 
 		/// <summary>
 		/// 初始化文件迁移
@@ -89,6 +90,7 @@ namespace Setup
 			else
 			{
 				logger.LogError($"file copy fail[{s}]:{path}");
+				ToMoveFiles.Enqueue(path);
 			}
 		}
 		public void CheckProcess()
@@ -106,7 +108,20 @@ namespace Setup
 			CheckProcess();
 			logger.LogWarning($"start migrating:{SrcPath} -> {DstPath}");
 			MovePath(SrcPath);
-			while (ToMoveFiles.TryDequeue(out var file)) { MoveFile(file); }
+			var tryTimes = 0;
+			var maxTryTimes = 10;
+			while (ToMoveFiles.Count > 0 && tryTimes++ < maxTryTimes)
+			{
+				WaitToMoveFiles = ToMoveFiles;
+				ToMoveFiles = new ConcurrentQueue<string>();
+				while (WaitToMoveFiles.TryDequeue(out var file)) { MoveFile(file); }
+				if (ToMoveFiles.Count > 0)
+				{
+					var desc = $"以上{ToMoveFiles.Count}个文件迁移失败，请检查，第{tryTimes}/{maxTryTimes}次尝试重新迁移...";
+					logger.LogError($"------\n{string.Join('\n',ToMoveFiles.ToList())}\n----{desc}");
+					Thread.Sleep(10000);
+				}
+			}
 			//new FileInfo(file).Copy(newPath);
 			//new DirectoryInfo(SrcPath).Copy(DstPath);
 		}
