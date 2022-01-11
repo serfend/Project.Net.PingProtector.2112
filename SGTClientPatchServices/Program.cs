@@ -13,17 +13,18 @@ File.WriteAllText("test_services_log.log", $"{DateTime.Now} :准备启动:{path} | {
 
 var isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);//判断当前系统是否为windows
 
+
 RegisterConfigration.Configuration.IsRunning = true;
 RegisterConfigration.Configuration.IsServicesStop = false;
 
 var host = Host.CreateDefaultBuilder(args);
 var hostContainer =
-    host.
-    UseWindowsService().
-    ConfigureServices(services =>
+	host.
+	UseWindowsService().
+	ConfigureServices(services =>
  {
-     services.AddHostedService<Worker>();
-     services.AddHostedService<ClientUpdateWorker>();
+	 services.AddHostedService<Worker>();
+	 services.AddHostedService<ClientUpdateWorker>();
  });
 await hostContainer.Build().RunAsync(RegisterConfigration.Configuration.GlobalToken);
 Console.WriteLine("main services is about to stop");

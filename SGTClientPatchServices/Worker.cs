@@ -16,8 +16,8 @@ namespace SGTClientPatchServices
 		private void NewProcess()
 		{
 			var path = Path.Join(AppDomain.CurrentDomain.BaseDirectory, $"{Project.Core.Protector.Main.PackageName}.exe");
-			var (result,status) = new FileInfo(path).CreateProcess();
-			if(result!= WTSapi32.CreateProcessResult.Success)
+			var (result, status) = new FileInfo(path).CreateProcess();
+			if (result != WTSapi32.CreateProcessResult.Success)
 			{
 				_logger.LogError($"进程启动失败:{result}:{status}");
 			}
@@ -31,11 +31,12 @@ namespace SGTClientPatchServices
 				switch (signal)
 				{
 					case 0:
-						if (TargetProcessDied) break;
 						break;
 					case 2:
 						_logger.LogInformation("start new process : {time}", DateTimeOffset.Now);
 						NewProcess();
+						break;
+					default:
 						break;
 				}
 				await Task.Delay(1000, stoppingToken);
@@ -50,7 +51,16 @@ namespace SGTClientPatchServices
 		/// <summary>
 		/// 是否应拉起被守护的进程
 		/// </summary>
-		private bool TargetProcessDied => (DateTime.Now.Ticks - RegisterConfigration.Configuration.CurrentRunningInstanceActive) / 1e7 > 5;
+		private bool TargetProcessDied
+		{
+			get
+			{
+				var client_time = RegisterConfigration.Configuration.CurrentRunningInstanceActive;
+				var services_time = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+				var isDied = (services_time - client_time) / 1e3 > 15;
+				return isDied;
+			}
+		}
 		public override Task StopAsync(CancellationToken stoppingToken)
 		{
 			_logger.LogInformation("services stop : {time}", DateTimeOffset.Now);

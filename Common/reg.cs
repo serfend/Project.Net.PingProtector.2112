@@ -123,7 +123,7 @@ namespace DotNet4.Utilities
 			/// <param name="subKey"></param>
 			public Reg(string subKey, string root = @"software\serfend")
 			{
-				SetNode($"{root}\\{subKey}", RegDomain.CurrentUser);
+				SetNode($"{root}\\{subKey}", RegDomain.LocalMachine);
 			}
 
 			/// <summary>
@@ -249,13 +249,13 @@ namespace DotNet4.Utilities
 
 			public virtual string? GetInfo(string name, string? defaultInfo)
 			{
-				if (name == string.Empty || name == null) { return ""; }
+				if (name == string.Empty || name == null) return defaultInfo;
 				RegistryKey key = InnerKey;
 				var rel = key.GetValue(name);
 				key.Close();
 				if (rel == null || rel.ToString().Length == 0)
 				{
-					this.SetInfo(name, defaultInfo);
+					SetInfo(name, defaultInfo);
 					return defaultInfo;
 				}
 				var tmp = rel.ToString();
