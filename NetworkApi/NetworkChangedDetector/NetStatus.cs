@@ -1,4 +1,4 @@
-﻿using NETworkManager.Models.Network;
+﻿using NetworkApi.Models;
 
 namespace NetworkApi.Network.NetworkChangedDetector
 {

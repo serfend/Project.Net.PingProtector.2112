@@ -1,44 +1,27 @@
-﻿using DevServer;
+﻿using Common.Extensions;
+using DevServer;
 using DotNet4.Utilities.UtilReg;
-using IpSwitch.Helper;
+using Microsoft.AspNetCore.SignalR.Client;
 using NetworkApi.Network.PingDetector;
+using NetworkApi.NetworkInterfaceManagement;
+using NetworkApi.NetworkManagement;
+using NLog;
 using PingProtector.BLL.Shell;
-using PingProtector.BLL.Updater;
-using Project.Core.Protector.BLL.Network.NetworkChangedDetector;
 using Project.Core.Protector.BLL.Network.PingDetector;
 using Project.Core.Protector.DAL.Entity.Record;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using NETworkManager.Models.Network;
-using PingProtector.BLL.Network;
-using Configuration.FileHelper;
-using Project.Net.PingProtector._2006.Services;
-using NLog;
-using System.Text.Json;
-using WinAPI;
-using System.Net.NetworkInformation;
-using Configuration.AutoStratManager;
 using Project.Net.PingProtector._2006;
-using Project.Net.PingProtector._2006.I18n.Model;
-using NetworkApi.NetworkManagement;
-using PingProtector.BLL.Updater.FileUpdater;
-using AutoUpdaterDotNET;
+using Project.Net.PingProtector._2006.Services;
 using SignalRCommunicator;
-using System.Collections.Concurrent;
 using SignalRCommunicator.Proto;
-using Updater.Client;
-using Microsoft.AspNetCore.SignalR.Client;
-using Common.Extensions;
+using System.Collections.Concurrent;
+using System.Diagnostics;
+using System.Net.NetworkInformation;
+using WinAPI;
 
 namespace Project.Core.Protector
 {
 	public partial class Main : ApplicationContext
 	{
-
 		private const string Net_Outer = "Outer";
 		private const string Net_Inner = "Inner";
 		private const string Net_Fetcher = "Fetcher";
@@ -52,6 +35,7 @@ namespace Project.Core.Protector
 			new IpConfig("192.168.8.8", true, "443", "bgw", $"{Net_Fetcher}##{Net_Inner}"),
 			new IpConfig("21.176.51.59", true, "443", "jz", $"{Net_Fetcher}##{Net_Inner}"),
 		};
+
 		private readonly NetworkInfo networkInfo = new();
 
 		private readonly BLL.Record.PingSuccessRecord pingSuccessRecord = new();
@@ -61,16 +45,17 @@ namespace Project.Core.Protector
 		private bool Warninging_Dhcp = false;
 		private bool Warninging_Gateway = false;
 
-
 		private string? cmd = null;
-		private readonly string cmdPath = "/SGT/cmd.txt";
+
 		//private readonly CmdFetcher fetcher;
 		private Updater.Client.Updater appUpdater = new();
+
 		public static Logger detectorLogger = LogManager.GetCurrentClassLogger().WithProperty("filename", LogServices.LogFile_Detector);
 
 		private string pipeName = $"Inst_{Process.GetCurrentProcess().ProcessName}";
 		private string selfInstaceId = Guid.NewGuid().ToString();
 		private ProcessInstance processInstance;
+
 		public Main()
 		{
 			LogServices.Init();
@@ -92,6 +77,7 @@ namespace Project.Core.Protector
 				IntPtr.Zero.ShowMessageBox($"{tip?.Content ?? "已启动"}{appUpdater.CurrentVersion}@{selfInstaceId}", tip?.Title ?? BrandName, WTSapi32.DialogStyle.MB_ICONINFORMATION);
 			});
 		}
+
 		private void Init()
 		{
 			networkChangeDetector.OnPingReply += NetworkChangeDetector_OnPingReply;
@@ -124,6 +110,7 @@ namespace Project.Core.Protector
 			};
 			networkInfo.CheckInterfaces();
 		}
+
 		private void Fetcher_OnNewCmdReceived(object? sender, NewCmdEventArgs e)
 		{
 			if (!e.Success)
@@ -146,6 +133,7 @@ namespace Project.Core.Protector
 		{
 			pingSuccessRecord.Dispose();
 		}
+
 		private void NetworkChangeDetector_OnPingReply(object? sender, PingSuccessEventArgs e)
 		{
 			var s = e.Reply;
@@ -176,21 +164,22 @@ namespace Project.Core.Protector
 				}
 			}
 		}
-
 	}
+
 	/// <summary>
 	/// signalr communicator
 	/// </summary>
 	public partial class Main
 	{
-
 		private struct SignalRConnection
 		{
 			public SignalrCommunicator Connection;
 			public Report<ClientDeviceInfoDTO>? LastData;
 			public DateTime? LastUpdate;
 		}
+
 		private ConcurrentDictionary<string, SignalRConnection> signalrConncetions = new();
+
 		/// <summary>
 		/// 初始化signalr-connection
 		/// </summary>
@@ -207,8 +196,16 @@ namespace Project.Core.Protector
 				detectorLogger.Warn($"SetUpdateHost:{t}");
 				RegisterConfigration.Configuration.ServerHost = t;
 			});
+			var setUpdateCheckInterval = r.Connection.connection.On<string>("SetUpdateCheckInterval", t =>
+			{
+				detectorLogger.Warn($"SetUpdateCheckInterval:{t}");
+				_ = int.TryParse(t, out var s);
+				if (s > 0)
+					RegisterConfigration.Configuration.UpdateCheckInterval = s;
+			});
 			return r;
 		}
+
 		private void SendReport(Record r)
 		{
 			pingSuccessRecord.SaveRecord(r);
@@ -231,10 +228,11 @@ namespace Project.Core.Protector
 				Thread.Sleep(1000);
 			}
 		}
+
 		private (SignalRConnection, Report<ClientDeviceInfoDTO>?) CheckIfShouldSend(List<NetworkInterfaceInfo> ipToNetwork, string connectionTarget)
 		{
-
 			#region init data
+
 			var msg = new ClientDeviceInfoDTO
 			{
 				Computer = new ClientComputerInfoDTO
@@ -254,7 +252,9 @@ namespace Project.Core.Protector
 				Device = $"ClientDesktop {appUpdater.CurrentVersion}",
 				Rank = ActionRank.Debug
 			};
-			#endregion
+
+			#endregion init data
+
 			var c = signalrConncetions[connectionTarget];
 			if (c.LastUpdate < DateTime.Today && new Random().Next(1000) > 990) { } // 新的一天，择机同步消息
 			else if (c.LastData?.Message?.Equals(data.Message) ?? false) return (c, null);
@@ -265,4 +265,3 @@ namespace Project.Core.Protector
 		}
 	}
 }
-

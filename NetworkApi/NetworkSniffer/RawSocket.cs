@@ -39,7 +39,7 @@ namespace PacketSnifferNET
 		public bool KeepRunning;
 		private static int len_receive_buf;
 		private byte[] receive_buf_bytes;
-		private Socket socket = null;
+		private Socket? socket = null;
 		private const int SIO_RCVALL = unchecked((int)0x98000001);
 		private const int ETH_P_ALL = 0x0003;
 
@@ -119,21 +119,21 @@ namespace PacketSnifferNET
 			}
 
 			[JsonIgnore]
-			public byte[] ReceiveBuffer
+			public byte[]? ReceiveBuffer
 			{
 				get { return receive_buf_bytes; }
 				set { receive_buf_bytes = value; }
 			}
 
 			[JsonIgnore]
-			public byte[] IPHeaderBuffer
+			public byte[]? IPHeaderBuffer
 			{
 				get { return ip_header_bytes; }
 				set { ip_header_bytes = value; }
 			}
 
 			[JsonIgnore]
-			public byte[] MessageBuffer
+			public byte[]? MessageBuffer
 			{
 				get { return message_bytes; }
 				set { message_bytes = value; }
@@ -148,12 +148,12 @@ namespace PacketSnifferNET
 			private uint total_packet_length;
 			private uint message_length;
 			private uint header_length;
-			private byte[] receive_buf_bytes = null;
-			private byte[] ip_header_bytes = null;
-			private byte[] message_bytes = null;
+			private byte[]? receive_buf_bytes = null;
+			private byte[]? ip_header_bytes = null;
+			private byte[]? message_bytes = null;
 		}
 
-		public event PacketArrivedEventHandler PacketArrival;
+		public event PacketArrivedEventHandler? PacketArrival;
 
 		public delegate void PacketArrivedEventHandler(Object sender, PacketArrivedEventArgs args);
 
@@ -193,12 +193,12 @@ namespace PacketSnifferNET
 			bool ret_value = true;
 			try
 			{
-				socket.SetSocketOption(SocketOptionLevel.IP, SocketOptionName.HeaderIncluded, 1);
+				socket?.SetSocketOption(SocketOptionLevel.IP, SocketOptionName.HeaderIncluded, 1);
 
 				byte[] IN = new byte[4] { 1, 0, 0, 0 };
 				byte[] OUT = new byte[4];
 
-				int ret_code = socket.IOControl(SIO_RCVALL, IN, OUT);
+				int? ret_code = socket?.IOControl(SIO_RCVALL, IN, OUT);
 				ret_code = OUT[0] + OUT[1] + OUT[2] + OUT[3];
 				if (ret_code != 0) ret_value = false;
 			}
@@ -217,7 +217,7 @@ namespace PacketSnifferNET
 			}
 		}
 
-		unsafe private void Receive(byte[] buf, int len)
+		private unsafe void Receive(byte[] buf, int len)
 		{
 			byte temp_protocol = 0;
 			uint temp_version = 0;
@@ -266,9 +266,9 @@ namespace PacketSnifferNET
 
 				e.ReceiveBuffer = buf;
 
-				Array.Copy(buf, 0, e.IPHeaderBuffer, 0, (int)e.HeaderLength);
+				if (e.IPHeaderBuffer != null) Array.Copy(buf, 0, e.IPHeaderBuffer, 0, (int)e.HeaderLength);
 
-				Array.Copy(buf, (int)e.HeaderLength, e.MessageBuffer, 0, (int)e.MessageLength);
+				if (e.MessageBuffer != null) Array.Copy(buf, (int)e.HeaderLength, e.MessageBuffer, 0, (int)e.MessageLength);
 			}
 
 			OnPacketArrival(e);
@@ -277,23 +277,23 @@ namespace PacketSnifferNET
 		//Start sniffering
 		public void Run()
 		{
-			IAsyncResult ar = socket.BeginReceive(receive_buf_bytes, 0, len_receive_buf, SocketFlags.None, new AsyncCallback(CallReceive), this);
+			IAsyncResult? ar = socket?.BeginReceive(receive_buf_bytes, 0, len_receive_buf, SocketFlags.None, new AsyncCallback(CallReceive), this);
 		}
 
 		//Async Callback
 		private void CallReceive(IAsyncResult ar)
 		{
-			int received_bytes;
+			int? received_bytes;
 			try
 			{
-				received_bytes = socket.EndReceive(ar);
+				received_bytes = socket?.EndReceive(ar);
 			}
-			catch (Exception ex)
+			catch (Exception)
 			{
 				received_bytes = receive_buf_bytes.Length;
 			}
-
-			Receive(receive_buf_bytes, received_bytes);
+			if (received_bytes == null) return;
+			Receive(receive_buf_bytes, received_bytes.Value);
 			if (KeepRunning) Run();
 		}
 

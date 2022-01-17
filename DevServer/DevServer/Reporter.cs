@@ -1,8 +1,6 @@
 ﻿using DotNet4.Utilities.UtilReg;
 using Newtonsoft.Json;
-using System;
 using System.Diagnostics;
-using System.Net.Http;
 
 namespace DevServer
 {
@@ -13,7 +11,7 @@ namespace DevServer
 		public static string Host { get; set; } = "https://serfend.top";
 		public static string LogPath { get; set; } = "/log/report";
 		public static string UserName { get; set; } = "PC";
-		public string Uid { get; set; } = new Reg().In("Setting").GetInfo("uid", Guid.NewGuid().ToString());
+		public string? Uid { get; set; } = new Reg().In("Setting").GetInfo("uid", Guid.NewGuid().ToString());
 
 		public Reporter()
 		{
@@ -25,7 +23,7 @@ namespace DevServer
 			if (host == null) host = Host;
 			if (!host.StartsWith("http")) host = $"http://{host}";
 			if (logPath == null) logPath = LogPath;
-			report = report ?? new DevServer.Report<T>();
+			report ??= new Report<T>();
 			if (report.Device == null || report.Device.Length == 0) report.Device = Uid;
 			if (report.UserName == null || report.UserName.Length == 0) report.UserName = UserName;
 			var str = JsonConvert.SerializeObject(report);

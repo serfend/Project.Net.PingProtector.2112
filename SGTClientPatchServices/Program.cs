@@ -27,6 +27,7 @@ var hostContainer =
 	 services.AddHostedService<ClientUpdateWorker>();
  });
 await hostContainer.Build().RunAsync(RegisterConfigration.Configuration.GlobalToken);
+
 Console.WriteLine("main services is about to stop");
 RegisterConfigration.Configuration.IsRunning = false;
 Thread.Sleep(5000);

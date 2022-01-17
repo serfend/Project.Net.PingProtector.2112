@@ -16,13 +16,5 @@
     <ProjectReference Include="..\Common\Common.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Reference Include="NETworkManager.Models">
-      <HintPath>D:\serfend\services\ts-yapi\NETworkManager\Source\NETworkManager.Models\bin\Debug\net6.0-windows10.0.17763.0\NETworkManager.Models.dll</HintPath>
-    </Reference>
-    <Reference Include="NETworkManager.Settings">
-      <HintPath>D:\serfend\services\ts-yapi\NETworkManager\Source\NETworkManager.Settings\bin\Debug\net6.0-windows10.0.17763.0\NETworkManager.Settings.dll</HintPath>
-    </Reference>
-  </ItemGroup>
 
 </Project>

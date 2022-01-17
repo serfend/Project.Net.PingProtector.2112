@@ -25,15 +25,14 @@ namespace SGTClientPatchServices
 			updater = new Updater.Client.Updater();
 		}
 
-
 		protected override async Task ExecuteAsync(CancellationToken stoppingToken)
 		{
 			_logger.LogInformation("update services execute : {time}", DateTimeOffset.Now);
 			AutoUpdater.CheckForUpdateEvent += AutoUpdater_CheckForUpdateEvent;
-			int cycleCounter = 10000;
+			int cycleCounter = RegisterConfigration.Configuration.UpdateCheckInterval;
 			while (!stoppingToken.IsCancellationRequested)
 			{
-				if (cycleCounter++ > 10000)
+				if (cycleCounter++ > RegisterConfigration.Configuration.UpdateCheckInterval)
 				{
 					cycleCounter = 0;
 					updater.Start();
@@ -50,9 +49,9 @@ namespace SGTClientPatchServices
 				_logger.LogWarning($"check update:available{args.IsUpdateAvailable},exception:{args.Error.ToSummary()}");
 				return;
 			}
-			RegisterConfigration.Configuration.UpdateAvailable = true;
+			RegisterConfigration.Configuration.UpdateAvailable = args.CurrentVersion;
 			Thread.Sleep(1000);
-			if (!RegisterConfigration.Configuration.UpdateAvailable) _logger.LogError("修改更新状态失败");
+			if (RegisterConfigration.Configuration.UpdateAvailable == null) _logger.LogError("修改更新状态失败");
 			var result = new FileInfo("Setup.exe").CreateProcess();
 			_logger.LogWarning($"start setup program...{result.Item1}:{result.Item2}");
 			RegisterConfigration.Configuration.IsServicesStop = true;

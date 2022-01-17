@@ -10,7 +10,6 @@ namespace WinAPI
 {
 	public static partial class WTSapi32
 	{
-
 		[DllImport("kernel32.dll", SetLastError = true)]
 		public static extern int WTSGetActiveConsoleSessionId();
 
@@ -26,7 +25,9 @@ namespace WinAPI
 			int Timeout,
 			out int pResponse,
 			bool bWait);
+
 		public static IntPtr WTS_CURRENT_SERVER_HANDLE = IntPtr.Zero;
+
 		public static int ShowMessageBox(this IntPtr hwnd, string message, string title, DialogStyle flag = 0)
 		{
 			WTSSendMessage(
@@ -37,8 +38,10 @@ namespace WinAPI
 			(int)flag, 0, out var resp, false);
 			return resp;
 		}
+
 		[Obsolete($"请使用{nameof(ShowMessageBox)}IntPtr来操作")]
 		public static int ShowMessageBox(string message, string title, DialogStyle flag = 0) => WTS_CURRENT_SERVER_HANDLE.ShowMessageBox(message, title, flag);
+
 		[Flags]
 		public enum DialogStyle : long
 		{
@@ -58,6 +61,7 @@ namespace WinAPI
 			MB_ICONERROR = 0x00000010L
 		}
 	}
+
 	public static partial class WTSapi32
 	{
 		public enum CreateProcessResult
@@ -68,50 +72,28 @@ namespace WinAPI
 			CreateEnvironmentBlockFail = 4,
 			CreateUserProcessFail = 8
 		}
+
 		public static (CreateProcessResult, int) CreateProcess(this FileInfo processFile)
 		{
-			if (processFile == null) throw new ArgumentNullException(nameof(processFile));
-			var app = processFile.Name;
+			if (processFile?.DirectoryName == null) throw new ArgumentNullException(nameof(processFile));
+			var app = processFile.FullName;
 			var path = processFile.DirectoryName;
-
 			bool result;
 			IntPtr hDupedToken = IntPtr.Zero;
-
 			var pi = new PROCESS_INFORMATION();
 			var sa = new SECURITY_ATTRIBUTES();
 			sa.Length = Marshal.SizeOf(sa);
-
 			var si = new STARTUPINFO();
 			si.cb = Marshal.SizeOf(si);
-
 			int dwSessionID = WTSGetActiveConsoleSessionId();
 			result = WTSQueryUserToken(dwSessionID, out var hToken);
-
-			if (!result) return (CreateProcessResult.WTSQueryUserTokenFail, 0);
-
-			result = DuplicateTokenEx(
-				  hToken,
-				  GENERIC_ALL_ACCESS,
-				  ref sa,
-				  (int)SECURITY_IMPERSONATION_LEVEL.SecurityIdentification,
-				  (int)TOKEN_TYPE.TokenPrimary,
-				  ref hDupedToken
-			   );
-
-			if (!result) return (CreateProcessResult.DuplicateTokenExFail, 0);
-
+			if (!result) return (CreateProcessResult.WTSQueryUserTokenFail, Marshal.GetLastWin32Error());
+			result = DuplicateTokenEx(hToken, GENERIC_ALL_ACCESS, ref sa, (int)SECURITY_IMPERSONATION_LEVEL.SecurityIdentification, (int)TOKEN_TYPE.TokenPrimary, ref hDupedToken);
+			if (!result) return (CreateProcessResult.DuplicateTokenExFail, Marshal.GetLastWin32Error());
 			result = CreateEnvironmentBlock(out var lpEnvironment, hDupedToken, false);
-
-			if (!result) return (CreateProcessResult.CreateEnvironmentBlockFail, 0);
-
+			if (!result) return (CreateProcessResult.CreateEnvironmentBlockFail, Marshal.GetLastWin32Error());
 			result = CreateProcessAsUser(hDupedToken, app, string.Empty, ref sa, ref sa, false, 0, IntPtr.Zero, path, ref si, ref pi);
-
-			if (!result)
-			{
-				int error = Marshal.GetLastWin32Error();
-				return (CreateProcessResult.CreateUserProcessFail, error);
-			}
-
+			if (!result) return (CreateProcessResult.CreateUserProcessFail, Marshal.GetLastWin32Error());
 			if (pi.hProcess != IntPtr.Zero)
 				CloseHandle(pi.hProcess);
 			if (pi.hThread != IntPtr.Zero)
@@ -181,7 +163,7 @@ namespace WinAPI
 		public static extern bool CloseHandle(IntPtr handle);
 
 		[DllImport("advapi32.dll", SetLastError = true,
-			CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)]
+			CharSet = CharSet.Auto, CallingConvention = CallingConvention.StdCall)]
 		public static extern bool CreateProcessAsUser(
 			IntPtr hToken,
 			string lpApplicationName,
@@ -210,7 +192,7 @@ namespace WinAPI
 			out IntPtr Token);
 
 		[DllImport("userenv.dll", SetLastError = true)]
-		static extern bool CreateEnvironmentBlock(
+		private static extern bool CreateEnvironmentBlock(
 			out IntPtr lpEnvironment,
 			IntPtr hToken,
 			bool bInherit);

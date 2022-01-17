@@ -6,19 +6,19 @@ namespace NETworkManager.Settings
 {
 	public class ConfigurationInfo : INotifyPropertyChanged
 	{
-		public event PropertyChangedEventHandler PropertyChanged;
+		public event PropertyChangedEventHandler? PropertyChanged;
 
-		protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+		protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
 		{
 			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 		}
 
 		public bool IsAdmin { get; set; }
-		public string ExecutionPath { get; set; }
-		public string ApplicationFullName { get; set; }
-		public string ApplicationName { get; set; }
+		public string? ExecutionPath { get; set; }
+		public string? ApplicationFullName { get; set; }
+		public string? ApplicationName { get; set; }
 		public bool IsPortable { get; set; }
-		public Version OSVersion { get; set; }
+		public Version? OSVersion { get; set; }
 
 		// Everything below will be set dynamically in the application
 		public bool ShowSettingsResetNoteOnStartup { get; set; }

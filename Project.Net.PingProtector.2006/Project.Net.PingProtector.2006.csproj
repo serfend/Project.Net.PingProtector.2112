@@ -4,8 +4,8 @@
   <ApplicationManifest>app.manifest</ApplicationManifest>
     <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net6.0-windows10.0.22000.0</TargetFramework>
-    <RootNamespace>Project.Net.PingProtector._2006</RootNamespace>
+	<TargetFramework>net6.0-windows10.0.17763.0</TargetFramework>
+	<RootNamespace>Project.Net.PingProtector._2006</RootNamespace>
     <Nullable>enable</Nullable>
     <UseWindowsForms>True</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -20,7 +20,6 @@
 
   <ItemGroup>
     <None Remove="app.manifest" />
-    <None Remove="favicon.ico" />
   </ItemGroup>
 
   <ItemGroup>
@@ -34,11 +33,6 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Google.Protobuf" Version="3.19.1" />
-    <PackageReference Include="Grpc.Net.Client" Version="2.41.0" />
-    <PackageReference Include="Grpc.Tools" Version="2.42.0">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="6.0.0" />
     <PackageReference Include="NLog" Version="4.7.13" />
   </ItemGroup>
@@ -54,7 +48,6 @@
     <ProjectReference Include="..\SignalRCommunicator\SignalRCommunicator.csproj" />
     <ProjectReference Include="..\Updater\UpdaterClient.csproj" />
     <ProjectReference Include="..\WinAPI\WinAPI.csproj" />
-    <ProjectReference Include="D:\serfend\services\ts-yapi\NETworkManager-raw\Source\NETworkManager.Models\NETworkManager.Models.csproj" />
   </ItemGroup>
 
 

@@ -1,6 +1,7 @@
 ﻿using AutoUpdaterDotNET;
 using Common.PowershellHelper;
 using Microsoft.Extensions.Logging;
+using PingProtector.BLL.Shell;
 using Setup.Extensions;
 using System;
 using System.Collections.Generic;
@@ -30,15 +31,19 @@ namespace Setup
 			this.logger = logger;
 		}
 
+		private const string UpdateSuccessFlag = "#UpdateSuccessFlag#";
+
 		public void Run(string[] args)
 		{
-			var hasNew = RegisterConfigration.Configuration.UpdateAvailable;
-			while (hasNew)
+			RegisterConfigration.Configuration.IsRunning = false;
+			var newVersion = RegisterConfigration.Configuration.UpdateAvailable;
+			while (newVersion != null && newVersion != UpdateSuccessFlag)
 			{
-				logger.LogWarning($"发现新版本");
-				RegisterConfigration.Configuration.UpdateAvailable = false;
+				logger.LogWarning($"发现新版本:{newVersion},开始下载和安装");
 				AutoUpdater.CheckForUpdateEvent += (e) =>
 				{
+					RegisterConfigration.Configuration.CurrentVersion = newVersion;
+					RegisterConfigration.Configuration.UpdateAvailable = UpdateSuccessFlag;
 					updater.StartDownload(e);
 					waitingForUpdate = false;
 				};
@@ -50,9 +55,19 @@ namespace Setup
 				};
 				waitingForUpdate = true;
 				updater.Start();
-				break;
+				Waiting();
+				return;
 			}
-			Waiting();
+			// 为已安装完成，则正常启动服务
+			while (newVersion == UpdateSuccessFlag)
+			{
+				new CmdExecutor().CmdRun("start services", "sc start ClientPatch");
+				RegisterConfigration.Configuration.UpdateAvailable = null;
+				Thread.Sleep(5000);
+				return;
+			}
+
+			// 否则则正常安装
 			var vNew = new Version(updater.CurrentVersion);
 			var vOld = new Version(RegisterConfigration.Configuration.CurrentVersion ?? "1.0.0");
 			logger.LogInformation($"version update:{vOld}->{vNew}");
@@ -65,6 +80,7 @@ namespace Setup
 			Install(args);
 			RegisterConfigration.Configuration.CurrentVersion = vNew.ToString();
 		}
+
 		private void Waiting()
 		{
 			int timeout = 120;
@@ -79,9 +95,9 @@ namespace Setup
 				Application.Exit();
 			}
 		}
+
 		private void Install(string[] args)
 		{
-
 			var startUpType = args.GetStartUpType();
 			var targetPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles));
 			logger.LogWarning($"即将安装{Program.brand}。\n以[{Environment.UserDomainName}/{Environment.UserName}][{string.Join('|', WindowsIdentity.GetCurrent().GetClaims())}]权限运行");
@@ -92,11 +108,9 @@ namespace Setup
 			{
 				if (e.FileStatus.HasFlag(WinAPI.FileHandlerExtensions.FileStatus.IsOccupy))
 				{
-
 				}
 			};
 			migrator.Migrate();
-
 
 			logger.LogWarning($"开始安装服务");
 			RegisterServices(startUpType);
@@ -108,11 +122,12 @@ namespace Setup
 			if (MessageBox.Show(null, "安装完成，需要重启", "完成", MessageBoxButtons.OKCancel) == DialogResult.OK)
 				PowerShellHelper.ExecuteCommand($"shutdown -r -t 0");
 		}
+
 		private void RegisterServices(StartUpType startUpType)
 		{
 			var exePath = Path.Combine(migrator.DstPath, $"SGTClientPatchServices.exe");
 			var r = new ServiceRegister(Program.packageName);
-			var count = r.Reg.InnerKey.ValueCount;
+			var count = r.Reg?.InnerKey?.ValueCount ?? 0;
 			logger.LogWarning($"检查服务字段:{count}总数");
 			if (count > 0)
 			{
@@ -121,7 +136,6 @@ namespace Setup
 			}
 			logger.LogWarning($"安装新版服务");
 			r.InstallService(exePath, Program.brand, ServiceStartType.Auto, Program.description);
-
 		}
 	}
 }

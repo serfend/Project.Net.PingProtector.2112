@@ -1,9 +1,11 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
+	<TargetFramework>net6.0-windows10.0.17763.0</TargetFramework>
+
+	<ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <SupportedOSPlatformVersion>7.0</SupportedOSPlatformVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -13,21 +15,10 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Common\Common.csproj" />
+    <ProjectReference Include="..\Configuration\Configuration.csproj" />
     <ProjectReference Include="..\DevServer\DevServer.csproj" />
     <ProjectReference Include="..\NetworkApi\NetworkApi.csproj" />
     <ProjectReference Include="..\PingProtector.DAL\PingProtector.DAL.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Reference Include="DSAPI">
-      <HintPath>..\vendor\DSAPI.dll</HintPath>
-    </Reference>
-    <Reference Include="NETworkManager.Models">
-      <HintPath>D:\serfend\services\ts-yapi\NETworkManager\Source\NETworkManager.Models\bin\Debug\net6.0-windows10.0.17763.0\NETworkManager.Models.dll</HintPath>
-    </Reference>
-    <Reference Include="NETworkManager.Settings">
-      <HintPath>D:\serfend\services\ts-yapi\NETworkManager\Source\NETworkManager.Settings\bin\Debug\net6.0-windows10.0.17763.0\NETworkManager.Settings.dll</HintPath>
-    </Reference>
   </ItemGroup>
 
 </Project>

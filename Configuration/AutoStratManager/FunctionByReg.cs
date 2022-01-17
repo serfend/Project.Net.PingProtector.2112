@@ -51,8 +51,9 @@ namespace Configuration.AutoStratManager
 
 			if (registryKey == null)
 				return; // LOG
-
-			registryKey.DeleteValue(ConfigurationManager.Current.ApplicationName);
+			var k = ConfigurationManager.Current.ApplicationName;
+			if (k == null) return;
+			registryKey.DeleteValue(k);
 			registryKey.Close();
 		}
 	}

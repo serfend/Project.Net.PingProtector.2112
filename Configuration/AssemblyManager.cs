@@ -9,13 +9,12 @@ namespace NETworkManager.Settings
 		static AssemblyManager()
 		{
 			var assembly = Assembly.GetEntryAssembly();
-
-			var name = assembly.GetName();
+			var name = assembly?.GetName() ?? new AssemblyName("Unknown");
 			Current = new AssemblyInfomation
 			{
 				Version = name.Version,
-				Location = assembly.Location.Replace(".dll", ".exe"),
-				Name = name.Name.Replace(".dll", ".exe")
+				Location = assembly?.Location.Replace(".dll", ".exe"),
+				Name = name.Name?.Replace(".dll", ".exe")
 			};
 		}
 	}

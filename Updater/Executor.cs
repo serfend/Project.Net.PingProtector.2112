@@ -6,7 +6,9 @@ namespace Updater.Client
 {
 	public class Updater
 	{
-		public Updater() : this("1.1.10") { }
+		public Updater() : this("1.2.38") {
+		
+		}
 		public Updater(string CurrentVersion)
 		{
 			this.CurrentVersion = CurrentVersion;
@@ -34,7 +36,7 @@ namespace Updater.Client
 			AutoUpdater.RunUpdateAsAdmin = true;
 			AutoUpdater.RemindLaterAt = 7;
 			AutoUpdater.RemindLaterTimeSpan = RemindLaterFormat.Days;
-			AutoUpdater.InstallationPath = InstallationPath ?? "D:\\bin";
+			if (InstallationPath != null) AutoUpdater.InstallationPath = InstallationPath;
 			AutoUpdater.InstalledVersion = new Version(CurrentVersion);
 			AutoUpdater.ApplicationExitEvent += () =>
 			{
@@ -72,7 +74,7 @@ namespace Updater.Client
 					InstallerArgs = config?.installerArgs ?? string.Empty,
 				};
 			};
-			
+
 			AutoUpdater.Start(ServerPath);
 		}
 		public event EventHandler<UpdateServerNotSetEventArgs>? OnUpdateServerNotSet;

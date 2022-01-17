@@ -49,7 +49,7 @@ namespace PacketSnifferNET
 
 		private static void CSCallbackFun(IntPtr data)
 		{
-			PacketData p = (PacketData)Marshal.PtrToStructure(data, typeof(PacketData));
+			var p = (PacketData)(Marshal.PtrToStructure(data, typeof(PacketData)) ?? new PacketData());
 			RawSocket.PacketArrivedEventArgs args = new RawSocket.PacketArrivedEventArgs
 			{
 				MessageLength = (uint)p.length,
@@ -64,7 +64,7 @@ namespace PacketSnifferNET
 			DataArrival(null, args);
 		}
 
-		private static void DataArrival(Object sender, RawSocket.PacketArrivedEventArgs e)
+		private static void DataArrival(object? sender, RawSocket.PacketArrivedEventArgs e)
 		{
 			Console.WriteLine(JsonConvert.SerializeObject(e));
 		}

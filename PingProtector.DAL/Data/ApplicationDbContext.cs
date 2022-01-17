@@ -10,6 +10,6 @@ namespace PingProtector.DAL.Data
 {
 	public class ApplicationDbContext : DbContext
 	{
-		public DbSet<Record> UserActionLogRecord { set; get; }
+		public DbSet<Record>? UserActionLogRecord { set; get; }
 	}
 }

@@ -63,7 +63,7 @@ namespace DotNet4.Utilities
 			/// <summary>
 			/// 注册表项名称
 			/// </summary>
-			private string _subkey;
+			private string _subkey = string.Empty;
 
 			/// <summary>
 			/// 注册表基项域
@@ -81,8 +81,8 @@ namespace DotNet4.Utilities
 			{
 				get
 				{
-					RegistryKey tmp = GetRegDomain(_domain);
-					RegistryKey target = tmp.OpenSubKey(_subkey, true);
+					var tmp = GetRegDomain(_domain);
+					var target = tmp.OpenSubKey(_subkey, true);
 					if (target == null) target = tmp.CreateSubKey(_subkey);
 					return target;
 				}
@@ -157,6 +157,7 @@ namespace DotNet4.Utilities
 			#endregion 构造函数
 
 			#region 公有方法
+
 			/// <summary>
 			/// 进入到它的子节点 node.in(childName).in(childChildName)...，当不命名时进入自己路径的一个新的实例
 			/// </summary>
@@ -170,6 +171,7 @@ namespace DotNet4.Utilities
 				}
 				return new Reg($"{_subkey}\\{childNodeName}", _domain);
 			}
+
 			/// <summary>
 			/// 回到其父节点
 			/// </summary>
@@ -179,8 +181,9 @@ namespace DotNet4.Utilities
 				var current = _subkey.Split('\\').ToList();
 				if (current.Count >= 1) current.RemoveAt(current.Count - 1);
 				var newPath = string.Join("\\", current);
-				return new Reg(newPath,_domain);
+				return new Reg(newPath, _domain);
 			}
+
 			/// <summary>
 			/// 删除此节点本身
 			/// </summary>
@@ -192,23 +195,24 @@ namespace DotNet4.Utilities
 				var n = Out();
 				return n.Delete(lastNode);
 			}
+
 			/// <summary>
 			/// 删除此节点下面的某个节点。
 			/// </summary>
 			/// <param name="subKey">要删除的节点名字</param>
 			/// <returns></returns>
-			public virtual bool Delete(string subKey)
+			public virtual bool Delete(string? subKey)
 			{
-				var success = false;
+				bool success;
 				if (subKey == string.Empty || subKey == null) return false;
 				RegistryKey key = InnerKey;
 
 				try
 				{
-					if (InnerKey.SubKeyCount > 0 || InnerKey.ValueCount > 0)
+					if (InnerKey.SubKeyCount > 0) // 说明有子项
 						key.DeleteSubKeyTree(subKey);
 					else
-						key.DeleteSubKey(subKey);
+						key.DeleteValue(subKey);
 					success = true;
 				}
 				catch
@@ -221,10 +225,11 @@ namespace DotNet4.Utilities
 
 			public virtual bool SetInfo(string? name, object? content)
 			{
+				if (content == null) return Delete(name);
 				return SetInfo(name, content, RegValueKind.String);
 			}
 
-			public virtual bool SetInfo(string name, object content, RegValueKind regValueKind)
+			public virtual bool SetInfo(string? name, object content, RegValueKind regValueKind)
 			{
 				if (string.IsNullOrEmpty(name)) { return false; }
 				RegistryKey key = InnerKey;
@@ -234,7 +239,7 @@ namespace DotNet4.Utilities
 					key.SetValue(name, content, GetRegValueKind(regValueKind));
 					success = true;
 				}
-				catch (Exception ex)
+				catch (Exception)
 				{
 					success = false;
 				}
@@ -245,20 +250,20 @@ namespace DotNet4.Utilities
 				return success;
 			}
 
-			public virtual string GetInfo(string name) => GetInfo(name, null);
+			public virtual string? GetInfo(string name) => GetInfo(name, null);
 
 			public virtual string? GetInfo(string name, string? defaultInfo)
 			{
 				if (name == string.Empty || name == null) return defaultInfo;
-				RegistryKey key = InnerKey;
+				var key = InnerKey;
 				var rel = key.GetValue(name);
 				key.Close();
-				if (rel == null || rel.ToString().Length == 0)
+				if (rel == null || (rel?.ToString()?.Length ?? 0) == 0)
 				{
 					SetInfo(name, defaultInfo);
 					return defaultInfo;
 				}
-				var tmp = rel.ToString();
+				var tmp = rel?.ToString() ?? string.Empty;
 				if (tmp.Contains("\0")) tmp = tmp.Substring(0, tmp.ToString().IndexOf('\0'));
 				return tmp;
 			}
@@ -331,12 +336,10 @@ namespace DotNet4.Utilities
 
 			protected virtual RegistryKey AutoOpenKey(string name)
 			{
+				var tmp = InnerKey;
 				if (name == string.Empty || name == null)
-				{
 					return InnerKey;
-				}
-				RegistryKey tmp = InnerKey;
-				RegistryKey key = tmp.OpenSubKey(name, true);
+				var key = tmp.OpenSubKey(name, true);
 				if (key == null) key = tmp.CreateSubKey(name);
 				tmp.Close();
 				return key;
@@ -349,7 +352,7 @@ namespace DotNet4.Utilities
 		{
 			private static int GetFormInfo(Reg fn, string name, int defaultInfo)
 			{
-				string infoTmp = fn.GetInfo(name, defaultInfo.ToString());
+				var infoTmp = fn?.GetInfo(name, defaultInfo.ToString()) ?? "0";
 				int tmp = Convert.ToInt32(infoTmp);
 				if (tmp <= 0) tmp = defaultInfo;
 				return tmp;

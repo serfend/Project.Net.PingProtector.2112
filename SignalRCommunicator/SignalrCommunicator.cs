@@ -13,10 +13,12 @@ namespace SignalRCommunicator
 			return TimeSpan.FromSeconds(time);
 		}
 	}
+
 	public class SignalrCommunicator
 	{
 		public HubConnection connection;
 		public static string TargetHub = "/ws/deviceClient";
+
 		public SignalrCommunicator(string ip)
 		{
 			var url = $"ws://{ip}{TargetHub}";
@@ -48,14 +50,18 @@ namespace SignalRCommunicator
 			var messageCommon = connection.On<string>("ReceiveMessage", t => { Console.WriteLine("Message"); });
 			connection.StartAsync();
 		}
+
 		public event EventHandler<MessageFailEventArgs>? OnMessageFail;
+
 		public event EventHandler<ConnectionLostEventArgs>? OnConnectionLost;
+
 		public event EventHandler<ConnectionRebuildEventArgs>? OnConnectionRebuild;
+
 		public Task<bool> ReportClientInfo<T>(Report<T> content) where T : class
 		{
 			if (content == null) return Task.FromResult(false);
-			if(content.UserName==null)content.UserName = String.Empty; 
-			if(!content.UserName.StartsWith(GlobalFlag.UserNamePrefix))content.UserName = $"{GlobalFlag.UserNamePrefix}{content.UserName}";
+			if (content.UserName == null) content.UserName = String.Empty;
+			if (!content.UserName.StartsWith(GlobalFlag.UserNamePrefix)) content.UserName = $"{GlobalFlag.UserNamePrefix}{content.UserName}";
 			if (connection.State == HubConnectionState.Connected)
 			{
 				try
@@ -71,6 +77,5 @@ namespace SignalRCommunicator
 			}
 			return Task.FromResult(false);
 		}
-
 	}
 }

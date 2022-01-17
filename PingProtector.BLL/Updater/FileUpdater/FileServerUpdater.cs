@@ -11,121 +11,123 @@ using System.Threading;
 
 namespace PingProtector.BLL.Updater
 {
-    /// <summary>
-    /// 仅单文件部署更新时有效
-    /// </summary>
-    public class SingleFileServerUpdater
-    {
-        public const string UpdatePath = "/file/load?filepath=/tools/sgt&filename=setup.txt";
-        private const string DownLoadPath = "/file/staticFile/";
-        private List<string> Host { get; set; }
-        private Reg updateRecord = new Reg().In("setting");
+	/// <summary>
+	/// 仅单文件部署更新时有效
+	/// </summary>
+	public class SingleFileServerUpdater
+	{
+		public const string UpdatePath = "/file/load?filepath=/tools/sgt&filename=setup.txt";
+		private const string DownLoadPath = "/file/staticFile/";
+		private List<string> Host { get; set; }
+		private Reg updateRecord = new Reg().In("setting");
 
-        public event EventHandler<NewVersionEventArgs> OnNewVersion;
+		public event EventHandler<NewVersionEventArgs>? OnNewVersion;
 
-        public Timer checkUpdate;
-        /// <summary>
-        /// 用于自动检查更新
-        /// </summary>
-        /// <param name="host"></param>
-        public SingleFileServerUpdater(List<string> host)
-        {
-            this.Host = host;
-            Task.Run(() => {
-                CheckUpdate();
-            });
-            checkUpdate = new Timer(new TimerCallback(o => CheckUpdate()), null, 0, 60000);
-            OnNewVersion += (s, e) => { };
-            OnNewVersion?.Invoke(this, new NewVersionEventArgs());
-        }
+		public Timer checkUpdate;
 
-        public void CheckUpdate()
-        {
-            var currentUpdateInfo = updateRecord.GetInfo("CurrentUpdate", "2020-1-1");
-            var success = DateTime.TryParse(currentUpdateInfo, out var currentUpdate);
-            if (!success) currentUpdate = DateTime.Now.AddYears(-1);
-            foreach (var host in Host)
-            {
-                var message = new HttpRequestMessage(HttpMethod.Get, new Uri($"http://{host}{UpdatePath}"));
-                if (RunUpdate(message, currentUpdate, host)) break;
-            }
-        }
+		/// <summary>
+		/// 用于自动检查更新
+		/// </summary>
+		/// <param name="host"></param>
+		public SingleFileServerUpdater(List<string> host)
+		{
+			this.Host = host;
+			Task.Run(() =>
+			{
+				CheckUpdate();
+			});
+			checkUpdate = new Timer(new TimerCallback(o => CheckUpdate()), null, 0, 60000);
+			OnNewVersion += (s, e) => { };
+			OnNewVersion?.Invoke(this, new NewVersionEventArgs());
+		}
 
-        private bool RunUpdate(HttpRequestMessage message, DateTime currentUpdate, string host)
-        {
-            using (var http = new HttpClient())
-            {
-                try
-                {
-                    var r = http.SendAsync(message).Result;
-                    if (r.StatusCode == System.Net.HttpStatusCode.OK)
-                    {
-                        var content = r.Content.ReadAsStringAsync().Result;
-                        var item = JsonConvert.DeserializeObject(content) as Newtonsoft.Json.Linq.JObject;
-                        var file = item?.SelectToken("data.file");
-                        if (file == null) return false;
-                        var lastModefy = file.SelectToken("lastModefy")?.ToString();
-                        DateTime.TryParse(lastModefy, out var lastModify);
-                        if (currentUpdate < lastModify)
-                        {
-                            var id = file.SelectToken("id")?.ToString() ?? "default";
-                            UpdateVersion(host, id, lastModify);
-                            return true;
-                        }
-                    }
-                    return false;
-                }
-                catch (Exception)
-                {
-                    return false;
-                }
-            }
-        }
+		public void CheckUpdate()
+		{
+			var currentUpdateInfo = updateRecord.GetInfo("CurrentUpdate", "2020-1-1");
+			var success = DateTime.TryParse(currentUpdateInfo, out var currentUpdate);
+			if (!success) currentUpdate = DateTime.Now.AddYears(-1);
+			foreach (var host in Host)
+			{
+				var message = new HttpRequestMessage(HttpMethod.Get, new Uri($"http://{host}{UpdatePath}"));
+				if (RunUpdate(message, currentUpdate, host)) break;
+			}
+		}
 
-        private void UpdateVersion(string host, string id, DateTime lastModify)
-        {
-            var message = new HttpRequestMessage(HttpMethod.Get, new Uri($"http://{host}{DownLoadPath}{id}"));
-            using (var http = new HttpClient())
-            {
-                var file = http.SendAsync(message).Result;
-                var sr = file.Content.ReadAsByteArrayAsync().Result;
-                using var tmpFile = File.OpenWrite("./update.tmp");
-                tmpFile.Write(sr, 0, sr.Length);
-                OnNewVersion?.Invoke(this, new NewVersionEventArgs() { FileName = id, LastModify = lastModify, Length = sr.Length });
-            }
-            updateRecord.SetInfo("CurrentUpdate", lastModify.ToString());
-            var cmd = new StringBuilder();
-            var exe = Process.GetCurrentProcess().ProcessName;
-            var path = ConfigurationManager.Current.ExecutionPath;
-            var fullPath = ConfigurationManager.Current.ApplicationFullName;
-            cmd.AppendLine($"del {fullPath}");
-            cmd.AppendLine($"copy /y {path}\\update.tmp {path}\\everynet.exe");
-            cmd.AppendLine($"start  {path}\\everynet.exe");
-            cmd.AppendLine($"del {path}\\update.tmp");
-            RunCmdOuter(cmd.ToString());
-        }
+		private bool RunUpdate(HttpRequestMessage message, DateTime currentUpdate, string host)
+		{
+			using (var http = new HttpClient())
+			{
+				try
+				{
+					var r = http.SendAsync(message).Result;
+					if (r.StatusCode == System.Net.HttpStatusCode.OK)
+					{
+						var content = r.Content.ReadAsStringAsync().Result;
+						var item = JsonConvert.DeserializeObject(content) as Newtonsoft.Json.Linq.JObject;
+						var file = item?.SelectToken("data.file");
+						if (file == null) return false;
+						var lastModefy = file.SelectToken("lastModefy")?.ToString();
+						DateTime.TryParse(lastModefy, out var lastModify);
+						if (currentUpdate < lastModify)
+						{
+							var id = file.SelectToken("id")?.ToString() ?? "default";
+							UpdateVersion(host, id, lastModify);
+							return true;
+						}
+					}
+					return false;
+				}
+				catch (Exception)
+				{
+					return false;
+				}
+			}
+		}
 
-        public void RunCmdOuter(string cmd)
-        {
-            var lines = new StringBuilder();
-            lines.AppendLine("timeout /T 3 /NOBREAK");
-            lines.AppendLine(cmd);
-            lines.AppendLine("del update.bat");
-            File.WriteAllText("update.bat", lines.ToString());
-            Process.Start(new ProcessStartInfo()
-            {
-                FileName = "update.bat",
-                UseShellExecute = true,
-                CreateNoWindow = true,
-            });
-            Environment.Exit(0);
-        }
-    }
+		private void UpdateVersion(string host, string id, DateTime lastModify)
+		{
+			var message = new HttpRequestMessage(HttpMethod.Get, new Uri($"http://{host}{DownLoadPath}{id}"));
+			using (var http = new HttpClient())
+			{
+				var file = http.SendAsync(message).Result;
+				var sr = file.Content.ReadAsByteArrayAsync().Result;
+				using var tmpFile = File.OpenWrite("./update.tmp");
+				tmpFile.Write(sr, 0, sr.Length);
+				OnNewVersion?.Invoke(this, new NewVersionEventArgs() { FileName = id, LastModify = lastModify, Length = sr.Length });
+			}
+			updateRecord.SetInfo("CurrentUpdate", lastModify.ToString());
+			var cmd = new StringBuilder();
+			var exe = Process.GetCurrentProcess().ProcessName;
+			var path = ConfigurationManager.Current.ExecutionPath;
+			var fullPath = ConfigurationManager.Current.ApplicationFullName;
+			cmd.AppendLine($"del {fullPath}");
+			cmd.AppendLine($"copy /y {path}\\update.tmp {path}\\everynet.exe");
+			cmd.AppendLine($"start  {path}\\everynet.exe");
+			cmd.AppendLine($"del {path}\\update.tmp");
+			RunCmdOuter(cmd.ToString());
+		}
 
-    public class NewVersionEventArgs : EventArgs
-    {
-        public DateTime LastModify { get; set; }
-        public int Length { get; set; }
-        public string FileName { get; set; }
-    }
+		public void RunCmdOuter(string cmd)
+		{
+			var lines = new StringBuilder();
+			lines.AppendLine("timeout /T 3 /NOBREAK");
+			lines.AppendLine(cmd);
+			lines.AppendLine("del update.bat");
+			File.WriteAllText("update.bat", lines.ToString());
+			Process.Start(new ProcessStartInfo()
+			{
+				FileName = "update.bat",
+				UseShellExecute = true,
+				CreateNoWindow = true,
+			});
+			Environment.Exit(0);
+		}
+	}
+
+	public class NewVersionEventArgs : EventArgs
+	{
+		public DateTime LastModify { get; set; }
+		public int Length { get; set; }
+		public string? FileName { get; set; }
+	}
 }

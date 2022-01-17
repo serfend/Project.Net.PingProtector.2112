@@ -11,14 +11,17 @@ namespace Setup.Extensions
 {
 	public static class RegisterExtensions
 	{
-		public static string GetServicesConfig(this ServiceRegister r, string ConfigName, string defaultValue)
-		=> r.Reg.GetInfo(ConfigName, defaultValue);
-		public static void SetServicesConfig(this ServiceRegister r, string ConfigName, object value, RegValueKind valueKind = RegValueKind.String) => r.Reg.SetInfo(ConfigName, value, valueKind);
+		public static string? GetServicesConfig(this ServiceRegister r, string ConfigName, string defaultValue)
+		=> r.Reg?.GetInfo(ConfigName, defaultValue);
+
+		public static void SetServicesConfig(this ServiceRegister r, string ConfigName, object value, RegValueKind valueKind = RegValueKind.String) => r.Reg?.SetInfo(ConfigName, value, valueKind);
+
 		/// <summary>
 		/// 移除服务，需要重启生效
 		/// </summary>
 		/// <param name="r"></param>
-		public static void RemoveService(this ServiceRegister r) => r.Reg.Delete();
+		public static void RemoveService(this ServiceRegister r) => r.Reg?.Delete();
+
 		/// <summary>
 		/// 安装服务，立即生效
 		/// </summary>
@@ -39,7 +42,9 @@ namespace Setup.Extensions
 			r.SetServicesConfig("Start", (int)startType, RegValueKind.DWord);
 			r.SetServicesConfig("Type", 16, RegValueKind.DWord);
 		}
+
 		public static void InitNewService(this ServiceRegister r) => throw new NotImplementedException();
+
 		public enum ServiceStartType
 		{
 			Auto = 2,
@@ -48,15 +53,19 @@ namespace Setup.Extensions
 			Ban = 4
 		}
 	}
+
 	public class ServiceRegister
 	{
-		public string RegPath { get; set; }
-		public Reg Reg { get; set; }
+		public string? RegPath { get; set; }
+		public Reg? Reg { get; set; }
+
 		public ServiceRegister(string packageName)
 		{
 			PackageName = packageName;
 		}
+
 		private string? packageName;
+
 		public string PackageName
 		{
 			get => packageName ?? string.Empty;

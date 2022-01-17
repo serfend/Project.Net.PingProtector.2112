@@ -118,8 +118,8 @@ namespace Setup
 				if (ToMoveFiles.Count > 0)
 				{
 					var desc = $"以上{ToMoveFiles.Count}个文件迁移失败，请检查，第{tryTimes}/{maxTryTimes}次尝试重新迁移...";
-					logger.LogError($"------\n{string.Join('\n',ToMoveFiles.ToList())}\n----{desc}");
-					Thread.Sleep(10000);
+					logger.LogError($"------\n{string.Join('\n', ToMoveFiles.ToList())}\n----{desc}");
+					for (var i = 0; i < 100; i++) Thread.Sleep(2 * i);
 				}
 			}
 			//new FileInfo(file).Copy(newPath);

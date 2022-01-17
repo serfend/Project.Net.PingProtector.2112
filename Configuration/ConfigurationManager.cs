@@ -19,7 +19,7 @@ namespace NETworkManager.Settings
 				ApplicationFullName = AssemblyManager.Current.Location,
 				ApplicationName = AssemblyManager.Current.Name,
 				OSVersion = System.Environment.OSVersion.Version,
-				IsPortable = File.Exists(Path.Combine(Path.GetDirectoryName(AssemblyManager.Current.Location), $"{IsPortableFileName}.{IsPortableExtension}"))
+				IsPortable = File.Exists(Path.Combine(Path.GetDirectoryName(AssemblyManager.Current.Location) ?? string.Empty, $"{IsPortableFileName}.{IsPortableExtension}"))
 			};
 		}
 	}
