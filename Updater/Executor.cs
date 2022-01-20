@@ -6,25 +6,32 @@ namespace Updater.Client
 {
 	public class Updater
 	{
-		public Updater() : this("1.2.38") {
-		
+		public Updater() : this("1.3.68")
+		{
 		}
+
 		public Updater(string CurrentVersion)
 		{
 			this.CurrentVersion = CurrentVersion;
 		}
+
 		public event EventHandler<UpdateInfoEventArgs>? RequiredExitProgram;
+
+		public event EventHandler<UpdateInfoEventArgs>? RequiredResetProgram;
+
 		public string? InstallationPath { get; set; }
 		public string? ServerPath => RegisterConfigration.Configuration.ServerHost;
 
 		public string CurrentVersion { get; }
+
 		public void StartDownload(UpdateInfoEventArgs e)
 		{
 			if (AutoUpdater.DownloadUpdate(e))
-			{
 				RequiredExitProgram?.Invoke(null, e);
-			};
+			else
+				RequiredResetProgram?.Invoke(null, e);
 		}
+
 		public void Start()
 		{
 			if (ServerPath == null)
@@ -77,6 +84,7 @@ namespace Updater.Client
 
 			AutoUpdater.Start(ServerPath);
 		}
+
 		public event EventHandler<UpdateServerNotSetEventArgs>? OnUpdateServerNotSet;
 	}
 }
