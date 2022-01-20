@@ -2,6 +2,8 @@
 using NetworkApi.NetworkInterfaceManagement;
 using Newtonsoft.Json;
 using NLog;
+using PingProtector.BLL.Network;
+using static PingProtector.BLL.Shell.MessageEventArgs;
 
 namespace Project.Net.PingProtector._2006.Services
 {
@@ -50,15 +52,15 @@ namespace Project.Net.PingProtector._2006.Services
 		{
 			var network_interface = new NetworkInterface();
 #if !DEBUG
-            Interfaces.ForEach(g =>
-            {
-                g.CheckDhcpConfigure();
-                g.CheckGatewayRange(listGateways);
-                g.CheckIpv6((s, e) =>
-                {
-                    detectorLogger.Log(e.Type == MessageType.Info ? LogLevel.Info : LogLevel.Error, e.Message);
-                });
-            });
+			Interfaces.ForEach(g =>
+			{
+				g.CheckDhcpConfigure();
+				g.CheckGatewayRange(listGateways);
+				g.CheckIpv6((s, e) =>
+				{
+					detectorLogger.Log(e.Type == MessageType.Info ? LogLevel.Info : LogLevel.Error, e.Message);
+				});
+			});
 #endif
 			return Interfaces;
 		}
