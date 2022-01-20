@@ -113,7 +113,7 @@ namespace DotNet4.Utilities
 			/// <summary>
 			/// 当无参数时默认在@"software\serfend\Default"
 			/// </summary>
-			public Reg() : this("Default")
+			public Reg() : this(@"software\serfend\Default")
 			{
 			}
 
@@ -121,10 +121,7 @@ namespace DotNet4.Utilities
 			/// 所有设置默认在@"software\serfend\"下
 			/// </summary>
 			/// <param name="subKey"></param>
-			public Reg(string subKey, string root = @"software\serfend")
-			{
-				SetNode($"{root}\\{subKey}", RegDomain.LocalMachine);
-			}
+			public Reg(string subKey) : this(subKey, RegDomain.LocalMachine) { }
 
 			/// <summary>
 			/// 其他时间默认自定义
@@ -136,9 +133,8 @@ namespace DotNet4.Utilities
 				SetNode(subKey, regDomain);
 			}
 
-			public Reg(Reg sKey)
+			public Reg(Reg sKey) : this(sKey.SubKey, sKey.Domain)
 			{
-				SetNode(sKey.SubKey, sKey.Domain);
 			}
 
 			/// <summary>
