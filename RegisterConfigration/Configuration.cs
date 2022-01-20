@@ -35,6 +35,16 @@ namespace RegisterConfigration
 			}
 		}
 
+		public static bool IgnoreUpdateOnTimeRange
+		{
+			get => int.Parse(processConfig.GetInfo("IgnoreUpdateOnTimeRange", "0") ?? "0") > 0;
+			set
+			{
+				processConfig.SetInfo("IgnoreUpdateOnTimeRange", value ? 1 : 0, RegValueKind.DWord);
+				if (value) globalToken.Cancel();
+			}
+		}
+
 		/// <summary>
 		/// 当前新版本的版本
 		/// </summary>

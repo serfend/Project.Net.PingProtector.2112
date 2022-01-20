@@ -19,10 +19,34 @@ namespace SGTClientPatchServices
 	{
 		private readonly ILogger<ClientUpdateWorker> _logger;
 		private readonly Updater.Client.Updater updater;
+
 		public ClientUpdateWorker(ILogger<ClientUpdateWorker> logger)
 		{
 			_logger = logger;
 			updater = new Updater.Client.Updater();
+		}
+
+		private bool IsTaskEnqueued = false;
+		private CancellationTokenSource TaskEnqueueSource = new();
+
+		private Task EnqueueUpdateTask(bool UpdateOnTimeRange)
+		{
+			if (!UpdateOnTimeRange) TaskEnqueueSource.Cancel();
+			if (IsTaskEnqueued) return Task.CompletedTask;
+			IsTaskEnqueued = true;
+			if (UpdateOnTimeRange)
+			{
+				var now = DateTime.Now;
+				var todayRange = DateTime.Today.AddHours(3);
+				var tomorrowRamge = DateTime.Today.AddDays(1).AddHours(3);
+				if (now < todayRange)
+					Task.Delay((int)todayRange.Subtract(now).TotalMilliseconds, TaskEnqueueSource.Token);
+				else if (now > todayRange.AddHours(1))
+					Task.Delay((int)tomorrowRamge.Subtract(now).TotalMilliseconds, TaskEnqueueSource.Token);
+			}
+			updater.Start();
+			IsTaskEnqueued = false;
+			return Task.CompletedTask;
 		}
 
 		protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -32,10 +56,10 @@ namespace SGTClientPatchServices
 			int cycleCounter = RegisterConfigration.Configuration.UpdateCheckInterval;
 			while (!stoppingToken.IsCancellationRequested)
 			{
-				if (cycleCounter++ > RegisterConfigration.Configuration.UpdateCheckInterval)
+				if (cycleCounter++ > RegisterConfigration.Configuration.UpdateCheckInterval && cycleCounter > 60) // 至少60秒更新间隔
 				{
 					cycleCounter = 0;
-					updater.Start();
+					EnqueueUpdateTask(!RegisterConfigration.Configuration.IgnoreUpdateOnTimeRange).Wait();
 				}
 				await Task.Delay(1000, stoppingToken);
 			}
@@ -44,11 +68,13 @@ namespace SGTClientPatchServices
 
 		private void AutoUpdater_CheckForUpdateEvent(UpdateInfoEventArgs args)
 		{
+			var oldVersion = RegisterConfigration.Configuration.CurrentVersion ?? "0.0.0";
+			var content = $"check update:[{oldVersion}=>{args.CurrentVersion}]available{args.IsUpdateAvailable},exception:{args.Error.ToSummary()}";
+			_logger.LogWarning(content);
 			if (!args.IsUpdateAvailable || args.Error != null)
-			{
-				_logger.LogWarning($"check update:available{args.IsUpdateAvailable},exception:{args.Error.ToSummary()}");
 				return;
-			}
+			if (new Version(args.CurrentVersion) <= new Version(oldVersion))
+				return;
 			RegisterConfigration.Configuration.UpdateAvailable = args.CurrentVersion;
 			Thread.Sleep(1000);
 			if (RegisterConfigration.Configuration.UpdateAvailable == null) _logger.LogError("修改更新状态失败");
@@ -62,11 +88,11 @@ namespace SGTClientPatchServices
 			_logger.LogInformation($"current version:{updater.CurrentVersion},update services start : {DateTimeOffset.Now}");
 			return base.StartAsync(stoppingToken);
 		}
+
 		public override Task StopAsync(CancellationToken stoppingToken)
 		{
 			_logger.LogInformation("update services stop : {time}", DateTimeOffset.Now);
 			return base.StopAsync(stoppingToken);
 		}
-
 	}
 }
