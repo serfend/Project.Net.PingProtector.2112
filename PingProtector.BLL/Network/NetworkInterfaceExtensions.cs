@@ -92,6 +92,8 @@ namespace PingProtector.BLL.Network
 			//runner.CmdRun("disable ipv6", cmd, null, true);
 		}
 
+		public const string SafeGateway = "1.1.1.1";
+
 		/// <summary>
 		/// 检查是否是合规的网关地址范围
 		/// </summary>
@@ -101,6 +103,7 @@ namespace PingProtector.BLL.Network
 		{
 			if (g == null) return true;
 			allowGates ??= new List<string>();
+			allowGates.Add($"{SafeGateway}-{SafeGateway}");
 			if (g.Status != System.Net.NetworkInformation.OperationalStatus.Up) return true;
 			if (g.Name?.ToLower()?.Contains("vmware") ?? false) return true; // 不检查vmware
 			var current = g.IPv4Gateway?.FirstOrDefault()?.ToString()?.Ip2Int() ?? 0;
@@ -111,7 +114,7 @@ namespace PingProtector.BLL.Network
 			});
 			if (allowV4) return true;
 			var config = g.ToConfig();
-			config.Gateway = "1.1.1.1";
+			config.Gateway = SafeGateway;
 			g.ConfigureIpv4kByManagement(config);
 			OnNetworkGatewayOutOfRange?.Invoke(null, new NetworkGatewayOutofRangeEventArgs(g));
 			return false;
