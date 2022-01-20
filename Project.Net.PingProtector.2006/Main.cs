@@ -48,12 +48,10 @@ namespace Project.Core.Protector
 		private string? cmd = null;
 
 		//private readonly CmdFetcher fetcher;
-		private Updater.Client.Updater appUpdater = new();
 
 		public static Logger detectorLogger = LogManager.GetCurrentClassLogger().WithProperty("filename", LogServices.LogFile_Detector);
 
 		private string pipeName = $"Inst_{Process.GetCurrentProcess().ProcessName}";
-		private string selfInstaceId = Guid.NewGuid().ToString();
 		private ProcessInstance processInstance;
 
 		public Main()
@@ -64,18 +62,13 @@ namespace Project.Core.Protector
 			processInstance = new ProcessInstance(pipeName);
 			processInstance.CheckInstaceByNamedPipe(null, () =>
 			{
-				detectorLogger.Warn($"新的实例已启动，关闭老实例@{selfInstaceId}");
+				detectorLogger.Warn($"新的实例已启动，关闭老实例@{Program.selfInstaceId}");
 				Environment.Exit(0);
 			});
 			networkChangeDetector = new PingDetector(null, ipDict.Select(ip => ip.Ip).ToArray());
 			var fetcherIp = ipDict.Where(ip => ip.Description != null && ip.Description.Contains(Net_Fetcher)).Select(ip => $"{ip.Ip}:{ip.Port}").ToList();
 			// fetcher = new CmdFetcher(fetcherIp, cmdPath);
 			Init();
-			Task.Run(() =>
-			{
-				var tip = ProjectI18n.Default?.Current?.Notification?.StartUpTip;
-				IntPtr.Zero.ShowMessageBox($"{tip?.Content ?? "已启动"}{appUpdater.CurrentVersion}@{selfInstaceId}", tip?.Title ?? BrandName, WTSapi32.DialogStyle.MB_ICONINFORMATION);
-			});
 		}
 
 		private void Init()
@@ -249,7 +242,7 @@ namespace Project.Core.Protector
 			{
 				UserName = new Reporter().Uid,
 				Message = msg,
-				Device = $"ClientDesktop {appUpdater.CurrentVersion}",
+				Device = $"ClientDesktop {Program.appUpdater.CurrentVersion}",
 				Rank = ActionRank.Debug
 			};
 
