@@ -31,6 +31,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ClientProxyTray\ClientProxyTray.csproj" />
+    <ProjectReference Include="..\PermissionManager\PermissionManager.csproj" />
     <ProjectReference Include="..\RegisterConfigration\RegisterConfigration.csproj" />
     <ProjectReference Include="..\SGTClientPatchServices\SGTClientPatchServices.csproj" />
     <ProjectReference Include="..\Updater\UpdaterClient.csproj" />

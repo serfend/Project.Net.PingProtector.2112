@@ -42,6 +42,7 @@
     <ProjectReference Include="..\Configuration\Configuration.csproj" />
     <ProjectReference Include="..\DevServer\DevServer.csproj" />
     <ProjectReference Include="..\NetworkApi\NetworkApi.csproj" />
+    <ProjectReference Include="..\PermissionManager\PermissionManager.csproj" />
     <ProjectReference Include="..\PingProtector.BLL\PingProtector.BLL.csproj" />
     <ProjectReference Include="..\PingProtector.DAL\PingProtector.DAL.csproj" />
     <ProjectReference Include="..\RegisterConfigration\RegisterConfigration.csproj" />
