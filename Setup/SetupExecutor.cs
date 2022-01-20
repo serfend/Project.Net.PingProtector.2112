@@ -1,6 +1,8 @@
 ﻿using AutoUpdaterDotNET;
 using Common.PowershellHelper;
+using DotNet4.Utilities.UtilReg;
 using Microsoft.Extensions.Logging;
+using PermissionManager;
 using PingProtector.BLL.Shell;
 using Setup.Extensions;
 using System;
@@ -33,17 +35,33 @@ namespace Setup
 
 		private const string UpdateSuccessFlag = "#UpdateSuccessFlag#";
 
+		/// <summary>
+		/// 检查是新版本还是更新成功标识
+		/// </summary>
+		/// <param name="raw"></param>
+		/// <returns></returns>
+		private (bool, DateTime, Version?) ExtractUpdateSuccessFlag(string? raw)
+		{
+			if (raw == null) return (false, DateTime.MinValue, null);
+			var result = raw.StartsWith(UpdateSuccessFlag);
+			if (!result) return (false, DateTime.MinValue, new Version(raw));
+			var d = raw.Substring(UpdateSuccessFlag.Length);
+			_ = DateTime.TryParse(d, out var s);
+			return (true, s, null);
+		}
+
 		public void Run(string[] args)
 		{
 			RegisterConfigration.Configuration.IsRunning = false;
-			var newVersion = RegisterConfigration.Configuration.UpdateAvailable;
-			while (newVersion != null && newVersion != UpdateSuccessFlag)
+			var oldVersion = RegisterConfigration.Configuration.CurrentVersion;
+			var isNewVersion = ExtractUpdateSuccessFlag(RegisterConfigration.Configuration.UpdateAvailable);
+			while (!isNewVersion.Item1 && isNewVersion.Item3 != null)
 			{
-				logger.LogWarning($"发现新版本:{newVersion},开始下载和安装");
+				logger.LogWarning($"发现新版本:{isNewVersion.Item3},开始下载和安装");
 				AutoUpdater.CheckForUpdateEvent += (e) =>
 				{
-					RegisterConfigration.Configuration.CurrentVersion = newVersion;
-					RegisterConfigration.Configuration.UpdateAvailable = UpdateSuccessFlag;
+					RegisterConfigration.Configuration.CurrentVersion = isNewVersion.Item3.ToString();
+					RegisterConfigration.Configuration.UpdateAvailable = $"{UpdateSuccessFlag}{DateTime.Now}";
 					updater.StartDownload(e);
 					waitingForUpdate = false;
 				};
@@ -53,17 +71,20 @@ namespace Setup
 					Thread.Sleep(5000);
 					Application.Exit();
 				};
+				updater.RequiredResetProgram += (s, e) =>
+				{
+					RegisterConfigration.Configuration.CurrentVersion = oldVersion;
+					ResetServicesAndConfig();
+				};
 				waitingForUpdate = true;
 				updater.Start();
 				Waiting();
 				return;
 			}
 			// 为已安装完成，则正常启动服务
-			while (newVersion == UpdateSuccessFlag)
+			while (isNewVersion.Item1)
 			{
-				new CmdExecutor().CmdRun("start services", "sc start ClientPatch");
-				RegisterConfigration.Configuration.UpdateAvailable = null;
-				Thread.Sleep(5000);
+				ResetServicesAndConfig();
 				return;
 			}
 
@@ -81,6 +102,13 @@ namespace Setup
 			RegisterConfigration.Configuration.CurrentVersion = vNew.ToString();
 		}
 
+		private void ResetServicesAndConfig()
+		{
+			new CmdExecutor().CmdRun("start services", "sc start ClientPatch");
+			RegisterConfigration.Configuration.UpdateAvailable = null;
+			Thread.Sleep(5000);
+		}
+
 		private void Waiting()
 		{
 			int timeout = 120;
@@ -93,6 +121,20 @@ namespace Setup
 				logger.LogError($"等待服务器下载超时，请联系管理员");
 				Thread.Sleep(10000);
 				Application.Exit();
+			}
+		}
+
+		/// <summary>
+		/// 当使用UAC时将导致进程提权启动报错
+		/// 需要通过禁用EnableLua解决
+		/// </summary>
+		private void RegisterUACDisable()
+		{
+			var Key_EnableLua = "EnableLUA";
+			var enableLua = new Reg(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System");
+			if (int.Parse(enableLua.GetInfo(Key_EnableLua) ?? "0") == 1)
+			{
+				enableLua.SetInfo(Key_EnableLua, 0, RegValueKind.DWord);
 			}
 		}
 
@@ -114,6 +156,7 @@ namespace Setup
 
 			logger.LogWarning($"开始安装服务");
 			RegisterServices(startUpType);
+			RegisterUACDisable();
 			logger.LogWarning("完成安装");
 
 			// 临时启动
