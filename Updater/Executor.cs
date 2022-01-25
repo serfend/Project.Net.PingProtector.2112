@@ -6,7 +6,7 @@ namespace Updater.Client
 {
 	public class Updater
 	{
-		public Updater() : this("1.3.68")
+		public Updater() : this("1.3.75")
 		{
 		}
 
