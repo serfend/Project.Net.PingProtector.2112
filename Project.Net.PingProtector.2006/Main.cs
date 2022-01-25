@@ -7,10 +7,12 @@ using NetworkApi.NetworkInterfaceManagement;
 using NetworkApi.NetworkManagement;
 using NLog;
 using PingProtector.BLL.Shell;
+using PingProtector.DAL.Entity.CommonConfig.Server;
 using Project.Core.Protector.BLL.Network.PingDetector;
 using Project.Core.Protector.DAL.Entity.Record;
 using Project.Net.PingProtector._2006;
 using Project.Net.PingProtector._2006.Services;
+using Project.Net.PingProtector._2006.UserConfigration;
 using SignalRCommunicator;
 using SignalRCommunicator.Proto;
 using System.Collections.Concurrent;
@@ -22,19 +24,9 @@ namespace Project.Core.Protector
 {
 	public partial class Main : ApplicationContext
 	{
-		private const string Net_Outer = "Outer";
-		private const string Net_Inner = "Inner";
-		private const string Net_Fetcher = "Fetcher";
-
-		private readonly List<IpConfig> ipDict = new()
-		{
-#if DEBUG
-			new IpConfig("192.168.8.196", true, "2334", "csw", $"{Net_Fetcher}##{Net_Inner}"),
-#endif
-			new IpConfig("serfend.top", true, "443", "gw", $"{Net_Outer}"),
-			new IpConfig("192.168.8.8", true, "443", "bgw", $"{Net_Fetcher}##{Net_Inner}"),
-			new IpConfig("21.176.51.59", true, "443", "jz", $"{Net_Fetcher}##{Net_Inner}"),
-		};
+		private readonly string currentEnvironment;
+		private readonly List<IpConfig> servers;
+		private readonly ServerMatchModel serverMatch;
 
 		private readonly NetworkInfo networkInfo = new();
 
@@ -58,6 +50,15 @@ namespace Project.Core.Protector
 		{
 			LogServices.Init();
 			detectorLogger.Log<string>(LogLevel.Info, "start");
+
+			#region InitConfigurations
+
+			currentEnvironment = UnitOfWork.GlobalConfig.Data.Env;
+			servers = UnitOfWork.ServerList.Data.Servers;
+			serverMatch = UnitOfWork.ServerList.Data.Match[currentEnvironment];
+
+			#endregion InitConfigurations
+
 			RegisterConfigration.Configuration.IsRunning = true;
 			processInstance = new ProcessInstance(pipeName);
 			processInstance.CheckInstaceByNamedPipe(null, () =>
@@ -65,8 +66,10 @@ namespace Project.Core.Protector
 				detectorLogger.Warn($"新的实例已启动，关闭老实例@{Program.selfInstaceId}");
 				Environment.Exit(0);
 			});
-			networkChangeDetector = new PingDetector(null, ipDict.Select(ip => ip.Ip).ToArray());
-			var fetcherIp = ipDict.Where(ip => ip.Description != null && ip.Description.Contains(Net_Fetcher)).Select(ip => $"{ip.Ip}:{ip.Port}").ToList();
+
+			networkChangeDetector = new PingDetector(null, serverMatch.Inner.Concat(serverMatch.Outer).ToServers(servers).Select(i => i?.Ip ?? string.Empty).ToArray());
+
+			var fetcherIp = serverMatch.Fetcher.ToServers(servers).Select(ip => $"{ip.Ip}:{ip.Port}").ToList();
 			// fetcher = new CmdFetcher(fetcherIp, cmdPath);
 			Init();
 		}
@@ -131,7 +134,7 @@ namespace Project.Core.Protector
 		{
 			var s = e.Reply;
 			// 注意当断网状态下时返回success，但ip是本地的可能性
-			if (ipDict.FirstOrDefault(ip => ip.Description != null && ip.Description.Contains(Net_Outer)) == null) return;
+			//if (ipDict.FirstOrDefault(ip => ip.Description != null && ip.Description.Contains(Net_Outer)) == null) return;
 
 			var r = new Record()
 			{
@@ -141,8 +144,8 @@ namespace Project.Core.Protector
 			};
 
 			var info = $"{r.TargetIp}@{s.RoundtripTime}ms";
-			var outerIp = ipDict.FirstOrDefault(ip => ip.Description != null && ip.Description.Contains(Net_Outer))?.Ip;
-			var successOuter = s.Address?.ToString() == outerIp;
+			var outerIp = serverMatch.Outer.ToServers(servers);
+			var successOuter = outerIp.Any(i => i.Ip == s.Address?.ToString());
 
 			SendReport(r);
 
@@ -202,7 +205,7 @@ namespace Project.Core.Protector
 		private void SendReport(Record r)
 		{
 			pingSuccessRecord.SaveRecord(r);
-			var host = ipDict.FirstOrDefault(ip => ip.Ip == r.TargetHost);
+			var host = servers.FirstOrDefault(ip => ip.Ip == r.TargetHost);
 			if (host == null) return;
 
 			var connectionTarget = $"{host.Ip}:{host.Port}";

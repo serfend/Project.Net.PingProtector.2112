@@ -12,6 +12,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Common\Common.csproj" />
+    <ProjectReference Include="..\PingProtector.DAL\PingProtector.DAL.csproj" />
   </ItemGroup>
 
 </Project>

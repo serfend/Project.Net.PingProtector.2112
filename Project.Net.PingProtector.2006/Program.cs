@@ -3,6 +3,7 @@ using Configuration.AutoStratManager;
 using PermissionManager;
 using Project.Core.Protector;
 using Project.Net.PingProtector._2006.I18n;
+using Project.Net.PingProtector._2006.UserConfigration;
 using System.Security.Principal;
 using WinAPI;
 
@@ -31,7 +32,6 @@ namespace Project.Net.PingProtector._2006
 				var regStartManager = new FunctionByReg();
 				startManager.EnableAsync();
 				regStartManager.EnableAsync();
-				ProjectI18n.Default = new ProjectI18n(new I18nReader());
 				Application.Run(new Main());
 			}
 			catch (Exception ex)
@@ -49,13 +49,16 @@ namespace Project.Net.PingProtector._2006
 			var nowPermission = WindowsIdentity.GetCurrent().GetClaims();
 			var token = $"{Environment.UserName}/{Environment.UserDomainName}";
 			var desc = $"{string.Join(',', nowPermission)}:{token}";
-
-			var tip = ProjectI18n.Default?.Current?.Notification?.StartUpTip;
+			var tip = UnitOfWork.I18N?.Current?.Notification?.StartUpTip;
+#if !DEBUG
 			if (!Environment.UserName.Contains("$"))
 			{
 				new PermissionChecker().UseSystem(); // 当使用特殊权限时会有$标识
+				Environment.Exit(0);
 				return;
 			}
+#endif
+
 			IntPtr.Zero.ShowMessageBox($"{tip?.Content ?? "已启动"}{appUpdater.CurrentVersion}@{selfInstaceId}\n{desc}", tip?.Title ?? Project.Core.Protector.Main.BrandName, WTSapi32.DialogStyle.MB_ICONINFORMATION);
 		}
 

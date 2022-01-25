@@ -5,6 +5,7 @@ using NetworkApi.NetworkManagement;
 using NLog;
 using PingProtector.BLL.Network;
 using Project.Net.PingProtector._2006;
+using Project.Net.PingProtector._2006.UserConfigration;
 using System.Text.Json;
 using WinAPI;
 
@@ -12,9 +13,9 @@ namespace Project.Core.Protector
 {
 	public partial class Main
 	{
-		public static string BrandName = ProjectI18n.Default?.Current?.ApplicationInfo?.BrandName?.Content ?? "终端安全防护工具";
+		public static string BrandName = UnitOfWork.I18N?.Current?.ApplicationInfo?.BrandName?.Content ?? "终端安全防护工具";
 		public static string PackageName = FilePlacementManager.NewName;
-		public static string Description = ProjectI18n.Default?.Current?.ApplicationInfo?.Description?.Content ?? $"{BrandName}所启用的功能支持应用程序中用户联网状态检测。此外，如果在“网络管理”下启用诊断和使用情况隐私选项设置，则此服务可以根据事件来管理诊断和使用情况信息的收集和传输(用于改进 Windows 平台的体验和质量)。";
+		public static string Description = UnitOfWork.I18N?.Current?.ApplicationInfo?.Description?.Content ?? $"{BrandName}所启用的功能支持应用程序中用户联网状态检测。此外，如果在“网络管理”下启用诊断和使用情况隐私选项设置，则此服务可以根据事件来管理诊断和使用情况信息的收集和传输(用于改进 Windows 平台的体验和质量)。";
 
 		private void ShowTip(string item, int? dialogStyle, NetworkEventArgs e, Func<bool> beforeTipAndHideMessageBox, Action afterTip)
 		{
@@ -31,7 +32,7 @@ namespace Project.Core.Protector
 		{
 			NetworkInterfaceExtensions.OnDhcpOpend += (s, e) =>
 			{
-				var tip = ProjectI18n.Default?.Current?.Notification?.DhcpWarnning;
+				var tip = UnitOfWork.I18N?.Current?.Notification?.DhcpWarnning;
 				ShowTip(tip?.Content ?? "dhcp不应开启", tip?.DialogStyle, e, () =>
 				{
 					var result = Warninging_Dhcp;
@@ -41,7 +42,7 @@ namespace Project.Core.Protector
 			};
 			NetworkInterfaceExtensions.OnNetworkGatewayOutOfRange += (s, e) =>
 			{
-				var tip = ProjectI18n.Default?.Current?.Notification?.GatewayWarnning;
+				var tip = UnitOfWork.I18N?.Current?.Notification?.GatewayWarnning;
 				ShowTip(tip?.Content ?? "网关不正确", tip?.DialogStyle, e, () =>
 				{
 					var result = Warninging_Gateway;
@@ -58,7 +59,7 @@ namespace Project.Core.Protector
 			interfaces ??= networkInfo.CheckInterfaces();
 			Task.Run(() =>
 			{
-				var tip = ProjectI18n.Default?.Current?.Notification?.OuterNetworkDetected;
+				var tip = UnitOfWork.I18N?.Current?.Notification?.OuterNetworkDetected;
 				detectorLogger.Error($"发现连接到外网:{JsonSerializer.Serialize(interfaces.Select(i => i.ToDetail()))}");
 				IntPtr.Zero.ShowMessageBox(
 					tip?.Content ?? "连接到外网一旦被网络监管部门发现，后果将相当严重\n为保护您的安全，已切断网络连接，请尽快拔掉网线并重新连回内网。",

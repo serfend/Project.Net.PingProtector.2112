@@ -8,6 +8,9 @@ namespace NetworkApi.Network.PingDetector
 {
 	public class IpConfig
 	{
+		public IpConfig()
+		{ }
+
 		public IpConfig(string ip, bool enable, string port, string? name = null, string? description = null)
 		{
 			Ip = ip;
@@ -17,10 +20,10 @@ namespace NetworkApi.Network.PingDetector
 			Description = description;
 		}
 
-		public string Ip { get; set; }
+		public string? Ip { get; set; }
 		public bool Enable { get; set; }
-		public string Port { get; }
+		public string? Port { get; set; }
 		public string? Name { get; set; }
-		public string? Description { get; }
+		public string? Description { get; set; }
 	}
 }
