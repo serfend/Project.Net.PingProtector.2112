@@ -1,4 +1,5 @@
-﻿using System;
+﻿using PingProtector.DAL.Entity;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -8,6 +9,40 @@ using System.Threading.Tasks;
 
 namespace Configuration.FileHelper
 {
+	/// <summary>
+	/// 配置文件加载
+	/// </summary>
+	public interface IConfigContent
+	{
+		/// <summary>
+		/// 读取配置
+		/// </summary>
+		/// <returns></returns>
+		public string Load();
+
+		/// <summary>
+		///
+		/// </summary>
+		/// <returns></returns>
+		public T Load<T>() where T : IBaseEntity, new();
+
+		/// <summary>
+		/// 存储配置
+		/// </summary>
+		/// <param name="Content"></param>
+		public void Save(string Content);
+
+		/// <summary>
+		/// 当加载失败时返回默认值
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		/// <returns></returns>
+		public T DefaultValue<T>() where T : IBaseEntity, new()
+		{
+			return (T)new T().DefaultValue();
+		}
+	}
+
 	public class CiperFile
 	{
 		public event EventHandler<UnhandledExceptionEventArgs>? ErrorOccured;
