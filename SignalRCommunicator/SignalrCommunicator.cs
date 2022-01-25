@@ -1,4 +1,5 @@
 ﻿using DevServer;
+using Microsoft.AspNetCore.Http.Connections;
 using Microsoft.AspNetCore.SignalR.Client;
 using SignalRCommunicator.Events;
 using SignalRCommunicator.Proto;
@@ -21,7 +22,7 @@ namespace SignalRCommunicator
 
 		public SignalrCommunicator(string ip)
 		{
-			var url = $"ws://{ip}{TargetHub}";
+			var url = $"wss://{ip}{TargetHub}";
 			connection = new HubConnectionBuilder()
 				.WithUrl(url, opts =>
 				{
@@ -32,7 +33,7 @@ namespace SignalRCommunicator
 								(sender, certificate, chain, sslPolicyErrors) => { return true; };
 						return message;
 					};
-					opts.Transports = Microsoft.AspNetCore.Http.Connections.HttpTransportType.WebSockets;
+					opts.Transports = HttpTransportType.ServerSentEvents | HttpTransportType.WebSockets | HttpTransportType.LongPolling | HttpTransportType.None;
 				})
 				.WithAutomaticReconnect(new DefaultRetryPolicy())
 				.Build();
@@ -66,8 +67,8 @@ namespace SignalRCommunicator
 			{
 				try
 				{
-					var result = connection.InvokeAsync<object>("Hi", content);
-					return Task.FromResult(null != result.Result);
+					var result = connection.InvokeAsync<object>("Hi", content).Result;
+					return Task.FromResult(null != result);
 				}
 				catch (Exception ex)
 				{

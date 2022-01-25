@@ -4,7 +4,7 @@
 	{
 		public static void Main()
 		{
-			var s = new SignalrCommunicator("localhost:2334");
+			var s = new SignalrCommunicator("serfend.top");
 			s.OnConnectionRebuild += (sender, e) =>
 			{
 				s.ReportClientInfo(new DevServer.Report<string>() { });
