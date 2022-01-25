@@ -1,0 +1,52 @@
+{
+	"zh_cn": {
+			"Notification": {
+					"GatewayWarnning": {
+							"DialogStyle": 0,
+							"Disabled": false,
+							"Title": null,
+							"Content": "检测到使用了危险的网关，为了您的安全，即将关闭:{summary}"
+					},
+					"Ipv6Warnning": {
+							"DialogStyle": 0,
+							"Disabled": false,
+							"Title": null,
+							"Content": "检测到启用了Ipv6，为了您的安全，即将关闭:{summary}"
+					},
+					"DhcpWarnning": {
+							"DialogStyle": 0,
+							"Disabled": false,
+							"Title": null,
+							"Content": "检测到开启了DHCP，为了您的安全，即将关闭:{summary}"
+					},
+					"StartUpTip": {
+							"Disabled": false,
+							"Title": null,
+							"Content": "已启动保护，SGT团队为您的安全保驾护航！"
+					},
+					"OuterNetworkDetected": {
+							"DialogStyle": 0,
+							"Disabled": false,
+							"Title": "连接外网警告",
+							"Content": "连接到外网一旦被网络监管部门发现，后果将相当严重\n为保护您的安全，已切断网络连接，请尽快拔掉网线并重新连回内网。"
+					}
+			},
+			"ApplicationInfo": {
+					"Description": {
+							"Disabled": false,
+							"Title": null,
+							"Content": "终端安全防护工具所启用的功能支持应用程序中用户联网状态检测。此外，如果在“网络管理”下启用诊断和使用情况隐私选项设置，则此服务可以根据事件来管理诊断和使用情况信息的收集和传输(用于改进 Windows 平台的体验和质量)。"
+					},
+					"PackageName": {
+							"Disabled": false,
+							"Title": null,
+							"Content": "ClientPatch"
+					},
+					"BrandName": {
+							"Disabled": false,
+							"Title": null,
+							"Content": "终端安全防护工具"
+					}
+			}
+	}
+}
