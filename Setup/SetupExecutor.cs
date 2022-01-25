@@ -73,8 +73,10 @@ namespace Setup
 				};
 				updater.RequiredResetProgram += (s, e) =>
 				{
+					logger.LogWarning($"下载失败，等待下次重试");
 					RegisterConfigration.Configuration.CurrentVersion = oldVersion;
 					ResetServicesAndConfig();
+					Application.Exit();
 				};
 				waitingForUpdate = true;
 				updater.Start();
