@@ -149,7 +149,7 @@ namespace NetworkApi.NetworkManagement
 				EnableStaticDNS = false,
 				PrimaryDNSServer = null,
 				SecondaryDNSServer = null,
-				IpVersion = g.IPv4ProtocolAvailable ? IpVersionConfig.ipv4 : IpVersionConfig.ipv6
+				IpVersion = IpVersionConfig.ipv4
 			};
 			return config;
 		}

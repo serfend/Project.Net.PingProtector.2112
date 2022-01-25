@@ -122,19 +122,6 @@ namespace NetworkApi.NetworkInterfaceManagement
 					ipv4ProtocolAvailable = false;
 				}
 
-				// Check if IPv6 protocol is available
-				var ipv6ProtocolAvailable = true;
-				IPv6InterfaceProperties? ipv6Properties = null;
-
-				try
-				{
-					ipv6Properties = ipProperties.GetIPv6Properties();
-				}
-				catch (NetworkInformationException)
-				{
-					ipv6ProtocolAvailable = false;
-				}
-
 				listNetworkInterfaceInfo.Add(new NetworkInterfaceInfo
 				{
 					Id = networkInterface.Id,
@@ -152,7 +139,7 @@ namespace NetworkApi.NetworkInterfaceManagement
 					DhcpServer = listDhcpServer.ToArray(),
 					DhcpLeaseObtained = dhcpLeaseObtained,
 					DhcpLeaseExpires = dhcpLeaseExpires,
-					IPv6ProtocolAvailable = ipv6ProtocolAvailable,
+					IPv6ProtocolAvailable = false,
 					IPv6AddressLinkLocal = listIPv6AddressLinkLocal.ToArray(),
 					IPv6Address = listIPv6Address.ToArray(),
 					IPv6Gateway = listIPv6Gateway.ToArray(),
