@@ -1,4 +1,5 @@
 ﻿using AutoUpdaterDotNET;
+using Common.CmdShellHelper;
 using Common.PowershellHelper;
 using DotNet4.Utilities.UtilReg;
 using Microsoft.Extensions.Logging;

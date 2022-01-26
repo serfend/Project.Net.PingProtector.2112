@@ -20,10 +20,21 @@
 
   <ItemGroup>
     <None Remove="app.manifest" />
+    <None Remove="conf\global.dat" />
+    <None Remove="conf\server-list-config.dat" />
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="conf\server-list-config.dat">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
     <Content Include="favicon.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="conf\global.dat">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
   </ItemGroup>
 
   <ItemGroup>

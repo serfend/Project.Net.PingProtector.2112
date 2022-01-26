@@ -1,4 +1,5 @@
-﻿using Common.Network;
+﻿using Common.CmdShellHelper;
+using Common.Network;
 using DotNet4.Utilities.UtilReg;
 using IpSwitch.Helper;
 using Microsoft.Win32;

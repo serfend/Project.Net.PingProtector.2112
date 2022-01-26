@@ -3,7 +3,7 @@ using NetworkApi.NetworkInterfaceManagement;
 using Newtonsoft.Json;
 using NLog;
 using PingProtector.BLL.Network;
-using static PingProtector.BLL.Shell.MessageEventArgs;
+using static Common.CmdShellHelper.MessageEventArgs;
 
 namespace Project.Net.PingProtector._2006.Services
 {

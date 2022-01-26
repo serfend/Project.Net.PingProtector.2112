@@ -1,4 +1,5 @@
-﻿using Common.Extensions;
+﻿using Common.CmdShellHelper;
+using Common.Extensions;
 using DevServer;
 using DotNet4.Utilities.UtilReg;
 using Microsoft.AspNetCore.SignalR.Client;
@@ -46,7 +47,7 @@ namespace Project.Core.Protector
 		private string pipeName = $"Inst_{Process.GetCurrentProcess().ProcessName}";
 		private ProcessInstance processInstance;
 
-		public Main()
+		public Main(string tip)
 		{
 			LogServices.Init();
 			detectorLogger.Log<string>(LogLevel.Info, "start");
@@ -56,6 +57,7 @@ namespace Project.Core.Protector
 			currentEnvironment = UnitOfWork.GlobalConfig.Data.Env;
 			servers = UnitOfWork.ServerList.Data.Servers;
 			serverMatch = UnitOfWork.ServerList.Data.Match[currentEnvironment];
+			WTSapi32.ShowMessageBox($"{tip}\n当前环境:{currentEnvironment}", "启动", WTSapi32.DialogStyle.MB_ICONINFORMATION);
 
 			#endregion InitConfigurations
 
@@ -145,7 +147,7 @@ namespace Project.Core.Protector
 
 			var info = $"{r.TargetIp}@{s.RoundtripTime}ms";
 			var outerIp = serverMatch.Outer.ToServers(servers);
-			var successOuter = outerIp.Any(i => i.Ip == s.Address?.ToString());
+			var successOuter = outerIp.Any(i => i.Ip == e.Host);
 
 			SendReport(r);
 

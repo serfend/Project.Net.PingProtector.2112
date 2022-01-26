@@ -1,9 +1,13 @@
 using Common.Extensions;
+using Common.NetworkHelper;
 using Configuration.AutoStratManager;
 using PermissionManager;
 using Project.Core.Protector;
 using Project.Net.PingProtector._2006.I18n;
 using Project.Net.PingProtector._2006.UserConfigration;
+using System.Net;
+using System.Net.Security;
+using System.Security.Cryptography.X509Certificates;
 using System.Security.Principal;
 using WinAPI;
 
@@ -26,13 +30,14 @@ namespace Project.Net.PingProtector._2006
 			{
 				AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
 				Application.ThreadException += Application_ThreadException;
-				StartPermissionCheck();
+				NetworkHttpConnectionExtensions.TrustSSL();
+				var tip = StartPermissionCheck();
 				//new FilePlacementManager().Check(); // 使用安装包模式部署
 				var startManager = new FunctionBySchedule();
 				var regStartManager = new FunctionByReg();
 				startManager.EnableAsync();
 				regStartManager.EnableAsync();
-				Application.Run(new Main());
+				Application.Run(new Main(tip));
 			}
 			catch (Exception ex)
 			{
@@ -44,7 +49,7 @@ namespace Project.Net.PingProtector._2006
 		/// <summary>
 		/// 检查权限，并弹出启动提示
 		/// </summary>
-		private static void StartPermissionCheck()
+		private static string StartPermissionCheck()
 		{
 			var nowPermission = WindowsIdentity.GetCurrent().GetClaims();
 			var token = $"{Environment.UserName}/{Environment.UserDomainName}";
@@ -55,11 +60,10 @@ namespace Project.Net.PingProtector._2006
 			{
 				new PermissionChecker().UseSystem(); // 当使用特殊权限时会有$标识
 				Environment.Exit(0);
-				return;
+				return null;
 			}
 #endif
-
-			IntPtr.Zero.ShowMessageBox($"{tip?.Content ?? "已启动"}{appUpdater.CurrentVersion}@{selfInstaceId}\n{desc}", tip?.Title ?? Project.Core.Protector.Main.BrandName, WTSapi32.DialogStyle.MB_ICONINFORMATION);
+			return $"{tip?.Content ?? "已启动"}{appUpdater.CurrentVersion}@{selfInstaceId}\n{desc}";
 		}
 
 		private static void Application_ThreadException(object sender, ThreadExceptionEventArgs e)

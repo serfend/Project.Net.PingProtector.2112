@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Common.CmdShellHelper;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -20,7 +21,7 @@ namespace PingProtector.BLL.Shell
 
 		public static async Task<IEnumerable<Tuple<string, string>>> RunAll()
 		{
-			var cmdRunner = new CmdExecutor();	
+			var cmdRunner = new CmdExecutor();
 			var tasks = ShellFileName
 				.Select(f => new Tuple<string, string>(f, File.ReadAllText(f, Encoding.UTF8)))
 				.Select(cmd => cmdRunner.CmdRunAsync(cmd.Item1, cmd.Item2));
