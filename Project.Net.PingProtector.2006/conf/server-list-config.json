@@ -1,49 +1,49 @@
 {
-	"Servers": [
-		{
-			"Ip": "192.168.8.196",
-			"Enable": true,
-			"Name": "csw",
-			"Port": "2334",
-			"Description": ""
-		},
-		{
-			"Ip": "serfend.top",
-			"Enable": true,
-			"Name": "gw",
-			"Port": "443",
-			"Description": ""
-		},
-		{
-			"Ip": "192.168.8.8",
-			"Enable": true,
-			"Name": "bgw",
-			"Port": "443",
-			"Description": ""
-		},
-		{
-			"Ip": "21.176.51.59",
-			"Enable": true,
-			"Name": "jzw",
-			"Port": "443",
-			"Description": ""
-		}
-	],
-	"Match":{
-		"csw":{
-			"Fetcher":["csw"],
-			"Inner":["gw","csw"],
-			"Outer":["bgw","jzw"]
-		},
-		"bgw":{
-			"Fetcher":["bgw"],
-			"Inner":["bgw"],
-			"Outer":["gw","jzw"]
-		},
-		"jzw":{
-			"Fetcher":["jzw"],
-			"Inner":["jzw"],
-			"Outer":["gw","bgw"]
-		}
+  "Servers": [
+	{
+	  "Ip": "192.168.8.196",
+	  "Enable": true,
+	  "Name": "csw",
+	  "Port": "2334",
+	  "Description": ""
+	},
+	{
+	  "Ip": "serfend.top",
+	  "Enable": true,
+	  "Name": "gw",
+	  "Port": "443",
+	  "Description": ""
+	},
+	{
+	  "Ip": "192.168.8.8",
+	  "Enable": true,
+	  "Name": "bgw",
+	  "Port": "443",
+	  "Description": ""
+	},
+	{
+	  "Ip": "21.176.51.59",
+	  "Enable": true,
+	  "Name": "jzw",
+	  "Port": "443",
+	  "Description": ""
 	}
+  ],
+  "Match": {
+	"csw": {
+	  "Fetcher": [ "csw" ],
+	  "Inner": [ "csw" ],
+	  "Outer": [ "bgw", "jzw" ]
+	},
+	"bgw": {
+	  "Fetcher": [ "bgw" ],
+	  "Inner": [ "bgw" ],
+	  "Outer": [ "gw", "jzw" ]
+	},
+	"jzw": {
+	  "Fetcher": [ "jzw" ],
+	  "Inner": [ "jzw" ],
+	  "Outer": [ "gw", "bgw" ]
+	}
+  }
 }
