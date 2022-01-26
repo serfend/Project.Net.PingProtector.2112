@@ -9,6 +9,7 @@ using System.Collections;
 using System.Net.NetworkInformation;
 using System.Linq;
 using System.Diagnostics;
+using Common.CmdShellHelper;
 
 namespace IpSwitch.Helper
 {
@@ -176,5 +177,29 @@ namespace IpSwitch.Helper
 			Fail = -1,
 			InvalidOperation = -2
 		}
+	}
+
+	public static class NetworkAdapterByShell
+	{
+		public static void Enable(string name) => RunNetShellSetInterface(new List<(string, string)>
+			{
+				{ ("Name", name)},
+				{ ("admin", "ENABLE")},
+			});
+
+		public static void Disable(string name) => RunNetShellSetInterface(new List<(string, string)>
+			{
+				{ ("Name", name)},
+				{ ("admin", "DISABLE")},
+			});
+
+		public static void RunNetShellSetInterface(IEnumerable<(string, string)> args) => RunNetShell("netsh interface set interface", args);
+
+		public static void RunNetShell(string cmd, IEnumerable<(string, string)> args) => new CmdExecutor().CmdRun($"{nameof(NetworkAdapterByShell)}{nameof(RunNetShell)}", $"{cmd} {string.Join(' ', args.Select(i => i.ToStatement()))}");
+	}
+
+	public static class ArgumentExtensions
+	{
+		public static string ToStatement(this (string, string) arg) => $"{arg.Item1}=\"{arg.Item2}\"";
 	}
 }

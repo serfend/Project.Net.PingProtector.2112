@@ -27,7 +27,7 @@ namespace NetworkApi.NetworkManagement
 		public IEnumerable<string?>? Dns { get; set; }
 	}
 
-	public static class NetworkInterfaceInfoExtensions
+	public static partial class NetworkInterfaceInfoExtensions
 	{
 		public static string ToSummary(this NetworkInterfaceInfo? info)
 		{
@@ -152,6 +152,25 @@ namespace NetworkApi.NetworkManagement
 				IpVersion = IpVersionConfig.ipv4
 			};
 			return config;
+		}
+	}
+
+	public static partial class NetworkInterfaceInfoExtensions
+	{
+		public static void DisabledByShell(this NetworkInterfaceInfo g)
+		{
+			if (g.Status == OperationalStatus.LowerLayerDown || g.Status == OperationalStatus.Down) return;
+			var i = g.Name;
+			if (i == null) return;
+			NetworkAdapterByShell.Disable(i);
+		}
+
+		public static void EnableByShell(this NetworkInterfaceInfo g)
+		{
+			if (g.Status == OperationalStatus.Up || g.Status == OperationalStatus.Unknown || g.Status == OperationalStatus.Testing) return;
+			var i = g.Name;
+			if (i == null) return;
+			NetworkAdapterByShell.Enable(i);
 		}
 	}
 }
