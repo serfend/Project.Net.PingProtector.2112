@@ -1,10 +1,13 @@
 using Common.Extensions;
 using Common.NetworkHelper;
 using Configuration.AutoStratManager;
+using EventLogHandler;
 using PermissionManager;
 using Project.Core.Protector;
 using Project.Net.PingProtector._2006.I18n;
+using Project.Net.PingProtector._2006.Services;
 using Project.Net.PingProtector._2006.UserConfigration;
+using System.Diagnostics;
 using System.Net;
 using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
@@ -26,6 +29,7 @@ namespace Project.Net.PingProtector._2006
 		private static void Main(string[] args)
 		{
 			ApplicationConfiguration.Initialize();
+			GlobalEventLog.DefaultLogger.WriteEntry("start new", EventLogEntryType.Error);
 			try
 			{
 				AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
@@ -41,8 +45,9 @@ namespace Project.Net.PingProtector._2006
 			}
 			catch (Exception ex)
 			{
-				var result = ex.ToSummary();
-				WTSapi32.ShowMessageBox(result, "主线异常", WTSapi32.DialogStyle.MB_OK | WTSapi32.DialogStyle.MB_ICONERROR);
+				var result = $"主线异常:\n{ex.ToSummary()}";
+				GlobalEventLog.DefaultLogger.WriteEntry(result, EventLogEntryType.Error);
+				//WTSapi32.ShowMessageBox(result, "主线异常", WTSapi32.DialogStyle.MB_OK | WTSapi32.DialogStyle.MB_ICONERROR);
 			}
 		}
 
@@ -68,12 +73,16 @@ namespace Project.Net.PingProtector._2006
 
 		private static void Application_ThreadException(object sender, ThreadExceptionEventArgs e)
 		{
-			WTSapi32.ShowMessageBox(e.Exception.ToSummary(), "线程错误", WTSapi32.DialogStyle.MB_OK | WTSapi32.DialogStyle.MB_ICONERROR);
+			var result = $"线程错误:\n{e.Exception.ToSummary()}";
+			GlobalEventLog.DefaultLogger.WriteEntry(result, EventLogEntryType.Error);
+			//WTSapi32.ShowMessageBox(e.Exception.ToSummary(), "线程错误", WTSapi32.DialogStyle.MB_OK | WTSapi32.DialogStyle.MB_ICONERROR);
 		}
 
 		private static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
 		{
-			WTSapi32.ShowMessageBox(e?.ExceptionObject?.ToString() ?? "无信息", "系统错误", WTSapi32.DialogStyle.MB_OK | WTSapi32.DialogStyle.MB_ICONERROR);
+			var result = $"系统错误:\n{e?.ExceptionObject?.ToString() ?? "无信息"}";
+			GlobalEventLog.DefaultLogger.WriteEntry(result, EventLogEntryType.Error);
+			//WTSapi32.ShowMessageBox(result, "系统错误", WTSapi32.DialogStyle.MB_OK | WTSapi32.DialogStyle.MB_ICONERROR);
 		}
 	}
 }
