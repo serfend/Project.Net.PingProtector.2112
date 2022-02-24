@@ -52,6 +52,7 @@
     <ProjectReference Include="..\Common\Common.csproj" />
     <ProjectReference Include="..\Configuration\Configuration.csproj" />
     <ProjectReference Include="..\DevServer\DevServer.csproj" />
+    <ProjectReference Include="..\EventLogHandler\EventLogHandler.csproj" />
     <ProjectReference Include="..\NetworkApi\NetworkApi.csproj" />
     <ProjectReference Include="..\PermissionManager\PermissionManager.csproj" />
     <ProjectReference Include="..\PingProtector.BLL\PingProtector.BLL.csproj" />

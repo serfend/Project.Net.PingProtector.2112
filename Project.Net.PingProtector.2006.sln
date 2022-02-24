@@ -47,7 +47,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PermissionManager", "Permis
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SignalR", "SignalR", "{5C95E20C-2A0F-4D0F-B197-05FBA4675390}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SignalRCommunicatorTest", "SignalRCommunicatorTest\SignalRCommunicatorTest.csproj", "{792E90ED-1D68-43AB-B965-30C9443CD207}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SignalRCommunicatorTest", "SignalRCommunicatorTest\SignalRCommunicatorTest.csproj", "{792E90ED-1D68-43AB-B965-30C9443CD207}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EventLogHandler", "EventLogHandler\EventLogHandler.csproj", "{53FBD04E-CCC1-4348-ABB5-B583320FFD12}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -127,6 +129,10 @@ Global
 		{792E90ED-1D68-43AB-B965-30C9443CD207}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{792E90ED-1D68-43AB-B965-30C9443CD207}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{792E90ED-1D68-43AB-B965-30C9443CD207}.Release|Any CPU.Build.0 = Release|Any CPU
+		{53FBD04E-CCC1-4348-ABB5-B583320FFD12}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{53FBD04E-CCC1-4348-ABB5-B583320FFD12}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{53FBD04E-CCC1-4348-ABB5-B583320FFD12}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{53FBD04E-CCC1-4348-ABB5-B583320FFD12}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -148,6 +154,7 @@ Global
 		{1030903A-9049-4038-A224-C558515A0FDE} = {98CF5686-9CE6-4997-95D1-742D425AC5C8}
 		{5C95E20C-2A0F-4D0F-B197-05FBA4675390} = {B80F91BF-DD05-4A12-8EDB-E2BB52667E04}
 		{792E90ED-1D68-43AB-B965-30C9443CD207} = {5C95E20C-2A0F-4D0F-B197-05FBA4675390}
+		{53FBD04E-CCC1-4348-ABB5-B583320FFD12} = {B80F91BF-DD05-4A12-8EDB-E2BB52667E04}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {F5410085-16A8-435F-8CAB-3FCF7CE64A63}
