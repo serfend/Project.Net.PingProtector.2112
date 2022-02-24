@@ -22,6 +22,6 @@ namespace Project.Net.PingProtector._2006
 
 		public T Current { get; set; }
 
-		public T GetI18N(string lang) => Data.ContainsKey(lang) ? Data[lang] : (T)new T().DefaultValue();
+		public T GetI18N(string lang) => Data.ContainsKey(lang) ? Data[lang] : (Data.FirstOrDefault().Value ?? (T)new T().DefaultValue());
 	}
 }

@@ -11,18 +11,20 @@ namespace ClientProxyTray
 	public partial class MainWindow : MetroWindow
 	{
 		private readonly ILogger<MainWindow> _logger;
-		System.Timers.Timer timer = new()
+
+		private System.Timers.Timer timer = new()
 		{
 			Enabled = true,
 			Interval = 1000
 		};
+
 		public MainWindow()
 		{
-
 			_logger = new Logger<MainWindow>(new LoggerFactory());
 			_logger.LogInformation("tray start");
 			timer.Elapsed += Timer_Elapsed;
 		}
+
 		private void Timer_Elapsed(object? sender, ElapsedEventArgs e)
 		{
 			if (!RegisterConfigration.Configuration.IsRunning)
@@ -38,6 +40,7 @@ namespace ClientProxyTray
 			SfTray.Dispose();
 			base.OnClosing(e);
 		}
+
 		private void ToggleSwitch_Toggled(object sender, RoutedEventArgs e)
 		{
 			var toggleSwitch = sender as ToggleSwitch;
@@ -60,5 +63,9 @@ namespace ClientProxyTray
 			}
 		}
 
+		private void MetroWindow_Loaded(object sender, RoutedEventArgs e)
+		{
+			this.Visibility = Visibility.Hidden;
+		}
 	}
 }
