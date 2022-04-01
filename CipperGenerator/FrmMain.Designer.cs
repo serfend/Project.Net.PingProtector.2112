@@ -72,7 +72,7 @@
 			// BtnSave
 			// 
 			this.BtnSave.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.BtnSave.Location = new System.Drawing.Point(615, 3);
+			this.BtnSave.Location = new System.Drawing.Point(615, 2);
 			this.BtnSave.Name = "BtnSave";
 			this.BtnSave.Size = new System.Drawing.Size(46, 29);
 			this.BtnSave.TabIndex = 2;

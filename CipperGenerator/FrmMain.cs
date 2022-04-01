@@ -12,7 +12,7 @@ namespace CipperGenerator
 		public FrmMain()
 		{
 			InitializeComponent();
-			File = new CiperFile() { Path = Config?.TxtFile };
+			File = new CiperFile(Config?.TxtFile ?? "");
 			File.ErrorOccured += (s, e) =>
 			{
 				MessageBox.Show((e.ExceptionObject as Exception)?.ToSummary());
@@ -26,7 +26,7 @@ namespace CipperGenerator
 			
 		}
 
-		private CiperFile frmSettingFile = new CiperFile() { Path = "app.setting.dat" };
+		private CiperFile frmSettingFile = new CiperFile("app.setting.dat");
 
 		private void FrmMain_Load(object sender, EventArgs e)
 		{
@@ -77,7 +77,7 @@ namespace CipperGenerator
 
 		private void BtnSave_Click(object sender, EventArgs e)
 		{
-			File.Content = (sender as TextBox)?.Text;
+			File.Content = TxtInput.Text;
 			File.Save();
 			MessageBox.Show($"ÒÑ±£´æ:{File.Path}");
 			//new Task(() =>

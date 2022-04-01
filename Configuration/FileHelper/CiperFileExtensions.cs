@@ -46,11 +46,14 @@ namespace Configuration.FileHelper
 	public class CiperFile
 	{
 		public event EventHandler<UnhandledExceptionEventArgs>? ErrorOccured;
-
+		public CiperFile(string path)
+		{
+			this.Path = path;
+		}
 		/// <summary>
 		/// 路径
 		/// </summary>
-		public string? Path { get; set; }
+		public string Path { get; set; }
 
 		/// <summary>
 		/// 密钥
@@ -62,7 +65,14 @@ namespace Configuration.FileHelper
 
 		public string? Load()
 		{
-			if (!File.Exists(Path)) return null;
+			var filename = System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName;
+			var basePath = System.IO.Path.GetDirectoryName(filename);
+			var path = System.IO.Path.Combine(basePath, Path);
+			if (!File.Exists(path))
+			{
+				ErrorOccured?.Invoke(this, new UnhandledExceptionEventArgs(new Exception($"target file not exist:{path}({filename})"), false));
+				return null;
+			}
 			try
 			{
 				using (Aes aesAlg = Aes.Create())
@@ -71,7 +81,7 @@ namespace Configuration.FileHelper
 					aesAlg.IV = IV;
 
 					ICryptoTransform encryptor = aesAlg.CreateDecryptor(aesAlg.Key, aesAlg.IV);
-					using var fs = new FileStream(Path, FileMode.Open);
+					using var fs = new FileStream(path, FileMode.Open, FileAccess.Read);
 					using var cs = new CryptoStream(fs, encryptor, CryptoStreamMode.Read);
 					using var sr = new StreamReader(cs);
 					Content = sr.ReadToEnd();
@@ -80,6 +90,7 @@ namespace Configuration.FileHelper
 			}
 			catch (Exception ex)
 			{
+				ErrorOccured?.Invoke(this, new UnhandledExceptionEventArgs(new Exception($"target file fail load:{path}({filename})"), false));
 				ErrorOccured?.Invoke(this, new UnhandledExceptionEventArgs(ex, false));
 			}
 			return null;
@@ -89,7 +100,7 @@ namespace Configuration.FileHelper
 		{
 			if (Path == null) return;
 
-			File.WriteAllText(Path, String.Empty);
+			File.WriteAllText(Path, string.Empty);
 			try
 			{
 				using (Aes aesAlg = Aes.Create())
