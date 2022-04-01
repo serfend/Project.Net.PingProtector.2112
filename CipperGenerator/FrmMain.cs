@@ -23,15 +23,7 @@ namespace CipperGenerator
 
 		private void TxtInput_KeyPress(object sender, KeyPressEventArgs e)
 		{
-			new Task(() =>
-			  {
-				  var now = Guid.NewGuid();
-				  lastUpdateTxtInput = now;
-				  Thread.Sleep(1000);
-				  if (now != lastUpdateTxtInput) return;
-				  File.Content = (sender as TextBox)?.Text;
-				  File.Save();
-			  }).Start();
+			
 		}
 
 		private CiperFile frmSettingFile = new CiperFile() { Path = "app.setting.dat" };
@@ -81,6 +73,23 @@ namespace CipperGenerator
 				frmSettingFile.Content = JsonSerializer.Serialize(Config);
 				frmSettingFile.Save();
 			}).Start();
+		}
+
+		private void BtnSave_Click(object sender, EventArgs e)
+		{
+			File.Content = (sender as TextBox)?.Text;
+			File.Save();
+			MessageBox.Show($"已保存:{File.Path}");
+			//new Task(() =>
+			//{
+			//	//var now = Guid.NewGuid();
+			//	//lastUpdateTxtInput = now;
+			//	//Thread.Sleep(1000);
+			//	//if (now != lastUpdateTxtInput) return;
+			//	File.Content = (sender as TextBox)?.Text;
+			//	File.Save();
+			//	MessageBox.Show($"已保存:{File.Path}");
+			//}).Start();
 		}
 	}
 

@@ -31,6 +31,7 @@
 			this.TxtInput = new System.Windows.Forms.TextBox();
 			this.TxtFile = new System.Windows.Forms.TextBox();
 			this.BtnSelect = new System.Windows.Forms.Button();
+			this.BtnSave = new System.Windows.Forms.Button();
 			this.SuspendLayout();
 			// 
 			// TxtInput
@@ -41,7 +42,7 @@
 			this.TxtInput.Location = new System.Drawing.Point(12, 38);
 			this.TxtInput.Multiline = true;
 			this.TxtInput.Name = "TxtInput";
-			this.TxtInput.Size = new System.Drawing.Size(578, 520);
+			this.TxtInput.Size = new System.Drawing.Size(649, 520);
 			this.TxtInput.TabIndex = 0;
 			this.TxtInput.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.TxtInput_KeyPress);
 			// 
@@ -52,7 +53,7 @@
 			this.TxtFile.Location = new System.Drawing.Point(12, 2);
 			this.TxtFile.Multiline = true;
 			this.TxtFile.Name = "TxtFile";
-			this.TxtFile.Size = new System.Drawing.Size(526, 30);
+			this.TxtFile.Size = new System.Drawing.Size(550, 30);
 			this.TxtFile.TabIndex = 0;
 			this.TxtFile.TextChanged += new System.EventHandler(this.TxtFile_TextChanged);
 			this.TxtFile.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.TxtInput_KeyPress);
@@ -60,7 +61,7 @@
 			// BtnSelect
 			// 
 			this.BtnSelect.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.BtnSelect.Location = new System.Drawing.Point(544, 2);
+			this.BtnSelect.Location = new System.Drawing.Point(568, 2);
 			this.BtnSelect.Name = "BtnSelect";
 			this.BtnSelect.Size = new System.Drawing.Size(46, 29);
 			this.BtnSelect.TabIndex = 1;
@@ -68,11 +69,23 @@
 			this.BtnSelect.UseVisualStyleBackColor = true;
 			this.BtnSelect.Click += new System.EventHandler(this.BtnSelect_Click);
 			// 
+			// BtnSave
+			// 
+			this.BtnSave.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.BtnSave.Location = new System.Drawing.Point(615, 3);
+			this.BtnSave.Name = "BtnSave";
+			this.BtnSave.Size = new System.Drawing.Size(46, 29);
+			this.BtnSave.TabIndex = 2;
+			this.BtnSave.Text = "保存";
+			this.BtnSave.UseVisualStyleBackColor = true;
+			this.BtnSave.Click += new System.EventHandler(this.BtnSave_Click);
+			// 
 			// FrmMain
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 17F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(602, 562);
+			this.ClientSize = new System.Drawing.Size(673, 562);
+			this.Controls.Add(this.BtnSave);
 			this.Controls.Add(this.BtnSelect);
 			this.Controls.Add(this.TxtFile);
 			this.Controls.Add(this.TxtInput);
@@ -90,5 +103,6 @@
         private TextBox TxtInput;
         private TextBox TxtFile;
         private Button BtnSelect;
-    }
+		private Button BtnSave;
+	}
 }
