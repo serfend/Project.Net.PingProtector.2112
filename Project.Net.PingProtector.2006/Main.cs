@@ -43,6 +43,7 @@ namespace Project.Core.Protector
 		//private readonly CmdFetcher fetcher;
 
 		public static Logger detectorLogger = LogManager.GetCurrentClassLogger().WithProperty("filename", LogServices.LogFile_Detector);
+		public static Logger mainLogger = LogManager.GetCurrentClassLogger().WithProperty("filename", LogServices.LogFile_Main);
 
 		private string pipeName = $"Inst_{Process.GetCurrentProcess().ProcessName}";
 		private ProcessInstance processInstance;
@@ -50,14 +51,14 @@ namespace Project.Core.Protector
 		public Main(string tip)
 		{
 			LogServices.Init();
-			detectorLogger.Log<string>(LogLevel.Info, "start");
+			mainLogger.Log<string>(LogLevel.Info, "start");
 
 			#region InitConfigurations
 
 			currentEnvironment = UnitOfWork.GlobalConfig.Data.Env;
 			servers = UnitOfWork.ServerList.Data.Servers;
 			serverMatch = UnitOfWork.ServerList.Data.Match[currentEnvironment];
-			WTSapi32.ShowMessageBox($"{tip}\n当前环境:{currentEnvironment}", "启动", WTSapi32.DialogStyle.MB_ICONINFORMATION);
+			LogServices.ShowMessageBox(IntPtr.Zero, $"{tip}\n当前环境:{currentEnvironment}", "启动", WTSapi32.DialogStyle.MB_ICONINFORMATION);
 
 			#endregion InitConfigurations
 
@@ -65,7 +66,7 @@ namespace Project.Core.Protector
 			processInstance = new ProcessInstance(pipeName);
 			processInstance.CheckInstaceByNamedPipe(null, () =>
 			{
-				detectorLogger.Warn($"新的实例已启动，关闭老实例@{Program.selfInstaceId}");
+				mainLogger.Warn($"新的实例已启动，关闭老实例@{Program.selfInstaceId}");
 				Environment.Exit(0);
 			});
 
@@ -85,7 +86,7 @@ namespace Project.Core.Protector
 				var isRunning = RegisterConfigration.Configuration.IsRunning;
 				if (!isRunning)
 				{
-					detectorLogger.Warn("运行已被要求停止");
+					mainLogger.Warn("运行已被要求停止");
 					Environment.Exit(0);
 				}
 				var interfaces = networkInfo.CheckInterfaces();
@@ -96,14 +97,12 @@ namespace Project.Core.Protector
 			{
 				var content = "检测到网络ip变化";
 				detectorLogger.Warn(content);
-				//IntPtr.Zero.ShowMessageBox(content, "监测");
 				networkInfo.CheckInterfaces();
 			};
 			NetworkChange.NetworkAvailabilityChanged += (s, e) =>
 			{
 				var content = "检测到网络ip变化";
 				detectorLogger.Warn(content);
-				//IntPtr.Zero.ShowMessageBox(content, "监测");
 				networkInfo.CheckInterfaces();
 			};
 			networkInfo.CheckInterfaces();

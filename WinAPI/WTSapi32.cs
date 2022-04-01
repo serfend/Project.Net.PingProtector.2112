@@ -39,8 +39,8 @@ namespace WinAPI
 			return resp;
 		}
 
-		[Obsolete($"请使用{nameof(ShowMessageBox)}IntPtr来操作")]
-		public static int ShowMessageBox(string message, string title, DialogStyle flag = 0) => WTS_CURRENT_SERVER_HANDLE.ShowMessageBox(message, title, flag);
+		//[Obsolete($"请使用{nameof(ShowMessageBox)}IntPtr来操作")]
+		//public static int ShowMessageBox(string message, string title, DialogStyle flag = 0) => WTS_CURRENT_SERVER_HANDLE.ShowMessageBox(message, title, flag);
 
 		[Flags]
 		public enum DialogStyle : long
