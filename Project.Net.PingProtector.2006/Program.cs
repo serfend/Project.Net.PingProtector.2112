@@ -29,7 +29,7 @@ namespace Project.Net.PingProtector._2006
 		private static void Main(string[] args)
 		{
 			ApplicationConfiguration.Initialize();
-			GlobalEventLog.DefaultLogger.WriteEntry("start new", EventLogEntryType.Error);
+			GlobalEventLog.DefaultLogger.WriteEntry("start new", EventLogEntryType.Information);
 			try
 			{
 				AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
@@ -60,14 +60,12 @@ namespace Project.Net.PingProtector._2006
 			var token = $"{Environment.UserName}/{Environment.UserDomainName}";
 			var desc = $"{string.Join(',', nowPermission)}:{token}";
 			var tip = UnitOfWork.I18N?.Current?.Notification?.StartUpTip;
-#if !DEBUG
 			if (!Environment.UserName.Contains("$"))
 			{
 				new PermissionChecker().UseSystem(); // 当使用特殊权限时会有$标识
 				Environment.Exit(0);
 				return null;
 			}
-#endif
 			return $"{tip?.Content ?? "已启动"}{appUpdater.CurrentVersion}@{selfInstaceId}\n{desc}";
 		}
 
