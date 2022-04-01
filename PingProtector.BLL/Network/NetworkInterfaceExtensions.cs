@@ -1,6 +1,7 @@
 ﻿using Common.CmdShellHelper;
 using Common.Network;
 using DotNet4.Utilities.UtilReg;
+using EventLogHandler;
 using IpSwitch.Helper;
 using Microsoft.Win32;
 using NetworkApi.NetworkInterfaceManagement;
@@ -106,11 +107,10 @@ namespace PingProtector.BLL.Network
 		{
 			if (g == null) return true;
 			allowGates ??= new List<string>();
-			allowGates.Add($"{SafeGateway}-{SafeGateway}");
 			if (g.Status != System.Net.NetworkInformation.OperationalStatus.Up) return true;
 			if (g.Name?.ToLower()?.Contains("vmware") ?? false) return true; // 不检查vmware
 			var current = g.IPv4Gateway?.FirstOrDefault()?.ToString()?.Ip2Int() ?? 0;
-			var allowV4 = allowGates.Any(i =>
+			var allowV4 = allowGates.Concat(new List<string>() { $"{SafeGateway}-{SafeGateway}" }).Any(i =>
 			{
 				var range = i.Ipv4Range();
 				return current >= range.Item1 && current <= range.Item2 || current == 0;
