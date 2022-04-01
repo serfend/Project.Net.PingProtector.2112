@@ -5,7 +5,7 @@
 		"DialogStyle": 48,
 		"Disabled": false,
 		"Title": null,
-		"Content": "检测到使用了危险的网关，为了您的安全，即将关闭:{summary}"
+		"Content": "检测到使用了危险的网关，为了您的安全，即将关闭。允许范围：{valid_info}，当前状态：{summary}"
 	  },
 	  "Ipv6Warnning": {
 		"DialogStyle": 48,

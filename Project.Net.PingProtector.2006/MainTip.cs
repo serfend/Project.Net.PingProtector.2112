@@ -22,6 +22,7 @@ namespace Project.Core.Protector
 			if (dialogStyle == 0) dialogStyle = null;
 			var msg = e.Interface.ToSummary();
 			var content = item.Replace("{summary}", msg);
+			content = content.Replace("{valid_info}", e.DetectInvalidInfo);
 			detectorLogger.Log<string>(LogLevel.Warn, $"{content}:{e.Interface.ToDetail()}");
 			if (beforeTipAndHideMessageBox?.Invoke() ?? false) return;
 			IntPtr.Zero.ShowMessageBox(content, BrandName, (WTSapi32.DialogStyle)(dialogStyle ?? ((int)WTSapi32.DialogStyle.MB_OK + (int)WTSapi32.DialogStyle.MB_ICONERROR)));

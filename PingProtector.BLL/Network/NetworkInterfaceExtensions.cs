@@ -20,23 +20,25 @@ namespace PingProtector.BLL.Network
 	public class NetworkEventArgs : EventArgs
 	{
 		public NetworkInterfaceInfo Interface { get; set; }
+		public string DetectInvalidInfo { get; set; }
 
-		public NetworkEventArgs(NetworkInterfaceInfo inter)
+		public NetworkEventArgs(NetworkInterfaceInfo inter, string detectInvalidInfo)
 		{
 			Interface = inter;
+			DetectInvalidInfo = detectInvalidInfo;
 		}
 	}
 
 	public class NetworkGatewayOutofRangeEventArgs : NetworkEventArgs
 	{
-		public NetworkGatewayOutofRangeEventArgs(NetworkInterfaceInfo inter) : base(inter)
+		public NetworkGatewayOutofRangeEventArgs(NetworkInterfaceInfo inter, string detectInvalidInfo) : base(inter, detectInvalidInfo)
 		{
 		}
 	}
 
 	public class DhcpOpendEventArgs : NetworkEventArgs
 	{
-		public DhcpOpendEventArgs(NetworkInterfaceInfo inter) : base(inter)
+		public DhcpOpendEventArgs(NetworkInterfaceInfo inter, string detectInvalidInfo) : base(inter, detectInvalidInfo)
 		{
 		}
 	}
@@ -59,7 +61,7 @@ namespace PingProtector.BLL.Network
 			if (!g.DhcpEnabled || g.Status != System.Net.NetworkInformation.OperationalStatus.Up) return false;
 			var config = g.ToConfig();
 			g.ConfigureIpv4kByManagement(config);
-			OnDhcpOpend?.Invoke(null, new DhcpOpendEventArgs(g));
+			OnDhcpOpend?.Invoke(null, new DhcpOpendEventArgs(g, $"{g.Status}"));
 
 			return true;
 		}
@@ -117,7 +119,7 @@ namespace PingProtector.BLL.Network
 			var config = g.ToConfig();
 			config.Gateway = SafeGateway;
 			g.ConfigureIpv4kByManagement(config);
-			OnNetworkGatewayOutOfRange?.Invoke(null, new NetworkGatewayOutofRangeEventArgs(g));
+			OnNetworkGatewayOutOfRange?.Invoke(null, new NetworkGatewayOutofRangeEventArgs(g, $"{string.Join(',', allowGates)}"));
 			return false;
 		}
 
